@@ -1,0 +1,4 @@
+#!/bin/bash
+#sleep 2
+
+xprop -notype WM_CLASS WM_NAME -id `xprop -root -notype _NET_ACTIVE_WINDOW | awk '/^_NET_ACTIVE_WINDOW/ {print $5;}'` | awk -F = '/^WM_NAME|^WM_CLASS/ {print $2;}'
