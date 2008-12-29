@@ -4,6 +4,7 @@ import sys
 import time
 import os
 import platform
+import codecs
 
 if platform.system() == 'Windows':
 	import win32gui
@@ -35,8 +36,9 @@ class TimeCollector():
         def openDataFile(self):
                 self.closeDataFile()
                 filename = checkDataDir() + time.strftime("/%d.txt",time.localtime())
-                self.file = open(filename,'a')
-                self.file.write('start\t'+hhmmss()+'\t'+' '.join(platform.uname())+' '+''.join(platform.dist())+'\n')
+                self.file = codecs.open(filename,'a',encoding="utf-8")
+                startline = 'start\t'+hhmmss()+'\t'+' '.join(platform.uname())+' '+''.join(platform.dist())+'\n'
+                self.file.write(startline)
                 self.lasttitle = ''
                 self.startday = time.localtime().tm_mday
 
@@ -66,7 +68,8 @@ class TimeCollector():
 
         def closeDataFile(self):
                 if not None == self.file and not self.file.closed:
-                        self.file.write('stop\t'+hhmmss())
+                        stopline = 'stop\t'+hhmmss()+'\n'
+                        self.file.write(stopline)
                         self.flushData()
                         self.file.close()
                                 
