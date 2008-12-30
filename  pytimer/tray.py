@@ -3,6 +3,7 @@
 import sys
 import wx
 from timecollector import TimeCollector
+import updatedailyappusage
 
 class TimeSaverTaskBarIcon(wx.TaskBarIcon):
     def __init__(self, parent):
@@ -15,6 +16,7 @@ class TimeSaverTaskBarIcon(wx.TaskBarIcon):
 
         self.menu = wx.Menu()
         self.menu.Append(101, '&Resume')
+        self.menu.Append(102, '&Today')
         self.menu.AppendSeparator()
         self.menu.Append(wx.ID_EXIT, '&Close')
 
@@ -54,6 +56,7 @@ class TimeSaver(wx.Frame):
         self.tray = TimeSaverTaskBarIcon(self)
         self.tray.Bind(wx.EVT_MENU, self.OnMenuClose, id=wx.ID_EXIT)
         self.tray.Bind(wx.EVT_MENU, self.OnResume, id=101)
+        self.tray.Bind(wx.EVT_MENU, self.onToday, id=102)
         self.tray.Bind(wx.EVT_TASKBAR_LEFT_DCLICK, self.OnResume)
         self.tray.SetIcon(self.icon)
 
@@ -100,6 +103,10 @@ class TimeSaver(wx.Frame):
         data = self.timecollector.collect()
         if self.IsShown():
             self.log(data)
+
+    def onToday(self,event):
+        updatedailyappusage.main([])
+        event.Skip()
 
 def main():
     app = wx.App(False)

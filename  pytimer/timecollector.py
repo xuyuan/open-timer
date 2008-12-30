@@ -4,7 +4,6 @@ import sys
 import time
 import os
 import platform
-import codecs
 
 if platform.system() == 'Windows':
 	import win32gui
@@ -36,7 +35,7 @@ class TimeCollector():
         def openDataFile(self):
                 self.closeDataFile()
                 filename = checkDataDir() + time.strftime("/%d.txt",time.localtime())
-                self.file = codecs.open(filename,'a',encoding="utf-8")
+                self.file = open(filename,'a')
                 startline = 'start\t'+hhmmss()+'\t'+' '.join(platform.uname())+' '+''.join(platform.dist())+'\n'
                 self.file.write(startline)
                 self.lasttitle = ''

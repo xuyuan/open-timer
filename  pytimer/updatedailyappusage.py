@@ -2,7 +2,6 @@
 # update daily app usage
 
 import re
-import codecs
 import time
 import webbrowser
 import sys
@@ -68,10 +67,11 @@ def update(filename):
     patternlist = createPatternList(patterndict)
     othercount = 0
     
-    f = codecs.open(filename,'r','utf-8')
+    f = open(filename,'r')
     line = f.readline()
     laststs = None
     while len(line) > 0:
+        #print line,
         if not pstart.match(line) or not pstop.match(line):
             title = line[9:]
             matched = False
@@ -110,7 +110,6 @@ def googlechartp3(pl):
     for p in pl:
         charturl = charturl + str(p.time/3600.0) + ','
     charturl = charturl[:-1]
-    #charturl += '&chxt=y&chxl=0:'
     charturl += '&chl='
     for p in pl:
         charturl = charturl + str(p.name) + '|'
