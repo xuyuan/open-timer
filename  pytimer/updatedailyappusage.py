@@ -36,9 +36,6 @@ class Pattern():
             ts = str(h) + 'h' + ts
         return ts
 
-pstart = re.compile('start')
-pstop = re.compile('stop')
-
 def createPatternList(sd):
     pl = []
     for x in sd.keys():
@@ -64,30 +61,46 @@ def update(filename):
                    'WindowsProgramManager':'^Progman Program Manager',
                    'WindowsMediaPlayer':'^WMPlayerApp Windows Media Player'}
 
+    pstart = Pattern('start','^start')
+    pstop = Pattern('stop','^stop')
+
     patternlist = createPatternList(patterndict)
     othercount = 0
     
     f = open(filename,'r')
     line = f.readline()
     laststs = None
+    lastmatched = pstart
     while len(line) > 0:
+        pmatched = pstart
         #print line,
-        if not pstart.match(line) or not pstop.match(line):
+        st = laststs
+        if pstart.match(line):
+            st = time.strptime(line[6:14],"%H:%M:%S")
+            pmatched = pstart
+        elif pstop.match(line):
+            st = time.strptime(line[5:13],"%H:%M:%S")
+            pmatched = pstop
+        else:
             title = line[9:]
             matched = False
+            st = time.strptime(line[:8],"%H:%M:%S")
             for p in patternlist:
                 if p.match(title):
-                    st = time.strptime(line[:8],"%H:%M:%S")
-                    sts = st.tm_hour*3600+st.tm_min*60+st.tm_sec
-                    if not None == laststs:
-                        dt = sts - laststs
-                        p.addTime(dt)
-                    laststs = sts
+                    pmatched = p
                     matched = True
                     break
             if not matched:
                 #print title,
                 othercount = othercount + 1
+
+        sts = st.tm_hour*3600+st.tm_min*60+st.tm_sec
+        if not None == laststs:
+            dt = sts - laststs
+            lastmatched.addTime(dt)
+        laststs = sts
+        lastmatched = pmatched
+            
         line = f.readline()
 
     tp = patternlist
