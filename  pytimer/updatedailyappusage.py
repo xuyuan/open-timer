@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
-# update daily app usage
+"""
+ update daily app usage
+"""
 
 import re
 import time
 import webbrowser
 import sys
+import googlechart
 
 class Pattern():
     def __init__(self, n, s):
@@ -120,60 +123,25 @@ def update(filename):
     patternlist.append(other)
     patternlist.sort()
     
-    
-    print
-    print
-    for p in patternlist:
-        print p.name, p.count, p.time/60.0
-    googlechartbhs(patternlist,filename)
+    #print
+    #print
+    #for p in patternlist:
+    #    print p.name, p.count, p.time/60.0
 
-def googlechartp3(pl):
-    charturl = "http://chart.apis.google.com/chart?chs=600x200&cht=p3&chco=0000ff&chd=t:"
-    for p in pl:
-        charturl = charturl + str(p.time/3600.0) + ','
-    charturl = charturl[:-1]
-    charturl += '&chl='
-    for p in pl:
-        charturl = charturl + str(p.name) + '|'
-    charturl = charturl[:-1]
-    webbrowser.open(charturl)
-
-def googlechartbhs(pl,title):
-    # type
-    charturl = "http://chart.apis.google.com/chart?cht=bhs&chco=0000ff"
-    # size
-    charturl += "&chs=600x"+ str(len(pl)*30+10)
-    # data
-    charturl += "&chd=t:"
-    for p in pl:
-        charturl = charturl + str(p.time/720.0) + ','
-    charturl = charturl[:-1]
-    # title
-    charturl += "&chtt=Your time in "+title[5:-4]
-    # label
-    charturl += '&chxt=y&chxl=0:|'
-    labelstr = ''
-    for p in pl:
-        labelstr = str(p.name) + '|' + labelstr
-    labelstr = labelstr[:-1]
-    charturl += labelstr
-    # mark
-    chmstr = '&chm='
-    i = 0
-    for p in pl:
-        chmstr += 't'+p.timeStr()+',000000,0,'+str(i)+',13|'
-        i+=1
-    chmstr = chmstr[:-1]
-    charturl += chmstr
-    
-    webbrowser.open(charturl)
+    return patternlist
 
 def main(argv):
+    file = None
     if len(argv) == 0:
-        todayfile = time.strftime('data/%Y/%m/%d.txt', time.localtime())
-        update(todayfile)
+        file = time.strftime('data/%Y/%m/%d.txt', time.localtime())
     else:
-        update(argv[0])
+        file = argv[0]
+
+    pl = update(file)
+        
+    # draw figure
+    charturl = googlechart.bhs(pl,'Your time @ '+file)
+    webbrowser.open(charturl)
 
 if __name__=="__main__":
     main(sys.argv[1:])
