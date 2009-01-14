@@ -5,6 +5,7 @@ import sys
 import time
 import os
 import platform
+import codecs
 
 if platform.system() == 'Windows':
 	import win32gui
@@ -36,7 +37,7 @@ class TimeCollector():
         def openDataFile(self):
                 self.closeDataFile()
                 filename = checkDataDir() + time.strftime("/%d.txt",time.localtime())
-                self.file = open(filename,'a')
+                self.file = codecs.open( filename, "a", "utf-8" )
                 startline = 'start\t'+hhmmss()+'\t'+' '.join(platform.uname())+' '+''.join(platform.dist())+'\n'
                 self.file.write(startline)
                 self.lasttitle = ''
@@ -44,7 +45,8 @@ class TimeCollector():
 
 	def getForegroundWindowTitleWindows(self):
 		w = win32gui.GetForegroundWindow()
-                return win32gui.GetClassName(w)+' '+win32gui.GetWindowText(w)
+                title = win32gui.GetClassName(w)+' '+win32gui.GetWindowText(w)
+		return unicode(title, 'gbk')
 
 	def getForegroundWindowTitleLinux(self):
 		s = subprocess.Popen('./window-title', stdout=subprocess.PIPE).communicate()[0]
@@ -59,7 +61,8 @@ class TimeCollector():
                 if not title == self.lasttitle:
                         data = hhmmss()+'\t'+title+'\n'
                         self.file.write(data)
-                        self.lasttitle = title
+			self.flushData()
+			self.lasttitle = title
                         return data
                 return ''
 
