@@ -65,43 +65,50 @@ def update(filename):
 
     pstart = Pattern('start','^start')
     pstop = Pattern('stop','^stop')
+    other = Pattern('other','.')
 
     patternlist = createPatternList(patterndict)
-    othercount = 0
+    
     
     f = open(filename,'r')
     line = f.readline()
     laststs = None
     lastmatched = pstart
     while len(line) > 0:
-        pmatched = pstart
+        pmatched = None
         #print line,
         st = laststs
         if pstart.match(line):
             st = time.strptime(line[6:14],"%H:%M:%S")
             pmatched = pstart
+            laststs = st.tm_hour*3600+st.tm_min*60+st.tm_sec
         elif pstop.match(line):
             st = time.strptime(line[5:13],"%H:%M:%S")
             pmatched = pstop
+            sts = st.tm_hour*3600+st.tm_min*60+st.tm_sec
+            dt = sts - laststs
+            lastmatched.addTime(dt)
+            laststs = sts
         else:
+            ismatched = False
             title = line[9:]
-            matched = False
             st = time.strptime(line[:8],"%H:%M:%S")
+            sts = st.tm_hour*3600+st.tm_min*60+st.tm_sec
+            dt = sts - laststs
+            lastmatched.addTime(dt)
             for p in patternlist:
                 if p.match(title):
                     pmatched = p
-                    matched = True
+                    ismatched = True
                     break
-            if not matched:
+            if not ismatched:
                 #print title,
-                othercount = othercount + 1
-
-        sts = st.tm_hour*3600+st.tm_min*60+st.tm_sec
-        if not None == laststs:
-            dt = sts - laststs
-            lastmatched.addTime(dt)
-        laststs = sts
-        lastmatched = pmatched
+                other.match(title)
+                pmatched = other
+                
+            laststs = sts
+            lastmatched = pmatched
+        
             
         line = f.readline()
 
@@ -110,6 +117,7 @@ def update(filename):
     for p in tp:
         if p.count > 0 :
             patternlist.append(p)
+    patternlist.append(other)
     patternlist.sort()
     
     
@@ -117,7 +125,6 @@ def update(filename):
     print
     for p in patternlist:
         print p.name, p.count, p.time/60.0
-    print 'other', othercount
     googlechartbhs(patternlist,filename)
 
 def googlechartp3(pl):
