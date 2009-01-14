@@ -59,7 +59,9 @@ def update(filename):
                    'AdobeReader':'.*Adobe Reader\r$',
                    'FunshionPlayer':'^funshion_player_tzdenjohn',
                    'WindowsProgramManager':'^Progman Program Manager',
-                   'WindowsMediaPlayer':'^WMPlayerApp Windows Media Player'}
+                   'WindowsMediaPlayer':'^WMPlayerApp Windows Media Player',
+                   'OpenOffice':'.*OpenOffice.org Calc$',
+                   'DigitalPhotoProfessional':'^ATL:0043D110 Digital Photo Professional|^#32770 Digital Photo Professional'}
 
     pstart = Pattern('start','^start')
     pstop = Pattern('stop','^stop')
