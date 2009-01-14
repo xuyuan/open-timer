@@ -1,5 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+"""
+collecting data from your current window's title
+
+Dependence (MS Windows):
+ Python Extensions for Windows (http://sourceforge.net/projects/pywin32/)
+"""
+__author__ = 'Xu, Yuan'
 
 import sys
 import time

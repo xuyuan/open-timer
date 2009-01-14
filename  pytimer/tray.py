@@ -1,5 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+"""
+The system tray of pytimer: a simple GUI.
+
+Dependence:
+   wxPython(www.wxpython.org)
+"""
+__author__ = 'Xu, Yuan'
 
 import sys
 import wx

@@ -2,6 +2,7 @@
 """
  update daily app usage
 """
+__author__ = 'Xu, Yuan'
 
 import re
 import time

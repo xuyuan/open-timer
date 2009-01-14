@@ -1,9 +1,15 @@
 # -*- coding: utf-8 -*-
 """
- use http://chart.apis.google.com draw figures
+ Generate charts using Google Chart,
+ please visit http://code.google.com/intl/en/apis/chart/
+ for more information
 """
+__author__ = 'Xu, Yuan'
 
 def bhs(pl,title):
+    """
+    Horizontal bar chart, with stacked bars.
+    """
     # type
     charturl = "http://chart.apis.google.com/chart?cht=bhs&chco=0000ff"
     # size
@@ -34,6 +40,9 @@ def bhs(pl,title):
     return charturl
 
 def p3(pl):
+    """
+    Three dimensional pie chart.
+    """
     charturl = "http://chart.apis.google.com/chart?chs=600x200&cht=p3&chco=0000ff&chd=t:"
     for p in pl:
         charturl = charturl + str(p.time/3600.0) + ','
