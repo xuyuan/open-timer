@@ -57,7 +57,8 @@ class TimeCollector():
 
 	def getForegroundWindowTitleLinux(self):
 		s = subprocess.Popen('./window-title', stdout=subprocess.PIPE).communicate()[0]
-		return s.replace('\n',' ');
+		title = s.replace('\n',' ')
+		return unicode(title, sys.stdin.encoding)
                 
         def collect(self):
                 day = time.localtime().tm_mday
