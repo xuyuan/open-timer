@@ -11,7 +11,7 @@ __author__ = 'Xu, Yuan'
 import sys
 import wx
 from timecollector import TimeCollector
-import updatedailyappusage
+import day
 
 class TimeSaverTaskBarIcon(wx.TaskBarIcon):
     def __init__(self, parent):
@@ -113,7 +113,7 @@ class TimeSaver(wx.Frame):
             self.log(data)
 
     def onToday(self,event):
-        updatedailyappusage.main([])
+        day.main([])
         event.Skip()
 
 def main():
