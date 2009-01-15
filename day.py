@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
- update daily app usage
+ update daily usage
 """
 __author__ = 'Xu, Yuan'
 
@@ -11,12 +11,12 @@ import webbrowser
 import sys
 import googlechart
 
-class Pattern():
+class Application():
     def __init__(self, n, s):
         self.name = n
         self.p = re.compile(s)
         self.count = 0
-        self.time = 0
+        self.t = 0
 
     def match(self,s):
         if self.p.match(s):
@@ -26,30 +26,54 @@ class Pattern():
             return False
 
     def addTime(self,t):
-        self.time += t
+        self.t += t
 
     def __cmp__(self, other):
-        return other.time - self.time
+        return other.time() - self.time()
 
-    def timeStr(self):
-        h = self.time / 3600
-        t = self.time % 3600
-        m = t / 60
-        s = t % 60
-        ts = str(m) + 'm' + str(s) +'s'
-        if h > 0:
-            ts = str(h) + 'h' + ts
-        return ts
+    def time(self):
+        return self.t
 
-def createPatternList(sd):
+def createListFromDict(type,sd):
     pl = []
     for x in sd.keys():
-        pl.append(Pattern(x,sd[x]))
+        pl.append(type(x,sd[x]))
     return pl
-    
 
-def update(filename):
-    patterndict = {
+def removeZeroTime(l):
+    r = []
+    for e in l:
+        if e.time() > 0 :
+            r.append(e)
+    return r
+    
+class Category():
+    """
+    Application category according to its function
+    """
+    def __init__(self,n,s):
+        self.name = n
+        self.p = re.compile(s)
+        self.apps = []
+
+    def match(self,app):
+        if self.p.match(app.name):
+            self.apps.append(app)
+            return True
+        else:
+            return False
+
+    def time(self):
+        t = 0
+        for a in self.apps:
+            t += a.time()
+        return t
+
+    def __cmp__(self, other):
+        return other.time() - self.time()
+
+def updateApp(filename):
+    appdict = {
         # windows applications
         'WindowsFileSystem':'^CabinetWClass',
         'Chrome':'^Chrome_',
@@ -67,25 +91,30 @@ def update(filename):
         'OpenOffice':'.*OpenOffice.org Calc$',
         'DigitalPhotoProfessional':'^ATL:0043D110 Digital Photo Professional|^#32770 Digital Photo Professional',
         'StormPlayer':'^Afx:400000:3:10003:2:',
+        'MSN':'^IMWindowClass|.*Windows Live Messenger$',
         # Linux applications
-        'Firefox':'^ "Navigator", "Firefox"',
+        'Firefox':'^ "Navigator", "Firefox"|^ "Dialog", "Firefox"',
         'GnomeTerminal':'^ "gnome-terminal"',
         'Kpdf':'^ "kpdf"',
         'Desktop':'^ "desktop_window"',
+        'Nautilus':'^ "nautilus"|^ "file_properties", "Nautilus"',
+        'Gedit':'^ "gedit"',
+        'GnomeSetting':'^ "gnome-control-center"|^ "gnome-appearance-properties"',
+        'Yast':'^ "y2controlcenter-gnome"|^ "y2base"',
         # Linux & Windows
         'Emacs':'^Emacs|^ "emacs"',
         'QQ':'^TXGuiFoundation|^ "qq"',
         'OpenOffice':'^ "VCLSalFrame", "OpenOffice.org 3.0"',
         'Skype':'^ "skype"',
         'Pidgin':'^ "pidgin"',
-        'Python':'^TkTopLevel|^Shell_TrayWnd|^ "python"',
+        'Python':'^TkTopLevel|^Shell_TrayWnd|^ "python"'
         }
 
-    pstart = Pattern('start','^start')
-    pstop = Pattern('stop','^stop')
-    other = Pattern('other','.')
+    pstart = Application('start','^start')
+    pstop = Application('stop','^stop')
+    other = Application('other','.')
 
-    patternlist = createPatternList(patterndict)
+    applist = createListFromDict(Application,appdict)
     
     
     f = open(filename,'r')
@@ -114,13 +143,13 @@ def update(filename):
             sts = st.tm_hour*3600+st.tm_min*60+st.tm_sec
             dt = sts - laststs
             lastmatched.addTime(dt)
-            for p in patternlist:
-                if p.match(title):
-                    pmatched = p
+            for a in applist:
+                if a.match(title):
+                    pmatched = a
                     ismatched = True
                     break
             if not ismatched:
-                #print title,
+                print title,
                 other.match(title)
                 pmatched = other
                 
@@ -130,20 +159,47 @@ def update(filename):
             
         line = f.readline()
 
-    tp = patternlist
-    patternlist = []
-    for p in tp:
-        if p.count > 0 :
-            patternlist.append(p)
-    patternlist.append(other)
-    patternlist.sort()
+    applist = removeZeroTime(applist)
+    applist.sort()
+    if other.time() > 0 :
+        applist.append(other)
     
     #print
     #print
     #for p in patternlist:
     #    print p.name, p.count, p.time/60.0
 
-    return patternlist
+    return applist
+
+def updateCategory(applist):
+    categoryDict = {
+        'InternetBrowser':'Firefox|Chrome|IE',
+        'Editor':'Emacs|Notepad|Gedit',
+        'PdfReader':'Kpdf|AdobeReader',
+        'Console':'WindowsConsole|GnomeTerminal',
+        'Messanger':'QQ|Pidgin|Skype|MSN',
+        'Video/Music':'StormPlayer|TTPlayer',
+        'SystemUtilities':'WindowsFileSystem|Nautilus|GnomeSetting|Yast',
+        'Office':'OpenOffice'
+        }
+
+    categoryList = createListFromDict(Category,categoryDict)
+    other = Category('Uncategorized','.')
+    for app in applist:
+        ismatched = False
+        for c in categoryList:
+            if c.match(app):
+                ismatched = True
+                break
+        if not ismatched:
+            other.match(app)
+    
+    categoryList = removeZeroTime(categoryList)
+    categoryList.sort()
+    if other.time() > 0 :
+        categoryList.append(other)
+
+    return categoryList
 
 def main(argv):
     file = None
@@ -152,10 +208,13 @@ def main(argv):
     else:
         file = argv[0]
 
-    pl = update(file)
+    pl = updateApp(file)
+    cl = updateCategory(pl)
         
     # draw figure
-    charturl = googlechart.bhs(pl,'Your time @ '+file)
+    charturl = googlechart.bhs(pl,'Your time @ '+file+' (Application)')
+    webbrowser.open(charturl)
+    charturl = googlechart.bhs(cl,'Your time @ '+file+' (Category)')
     webbrowser.open(charturl)
 
 if __name__=="__main__":

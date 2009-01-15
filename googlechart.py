@@ -6,10 +6,21 @@
 """
 __author__ = 'Xu, Yuan'
 
+def second2Str(sec):
+    h = sec / 3600
+    t = sec % 3600
+    m = t / 60
+    s = t % 60
+    ts = str(m) + 'm' + str(s) +'s'
+    if h > 0:
+        ts = str(h) + 'h' + ts
+    return ts
+
 def bhs(pl,title):
     """
     Horizontal bar chart, with stacked bars.
     """
+    pl = pl[:15] # Chart may contain at most 300000, pixels.
     # type
     charturl = "http://chart.apis.google.com/chart?cht=bhs&chco=0000ff"
     # size
@@ -17,7 +28,7 @@ def bhs(pl,title):
     # data
     charturl += "&chd=t:"
     for p in pl:
-        charturl = charturl + str(p.time/720.0) + ','
+        charturl = charturl + str(p.time()/720.0) + ','
     charturl = charturl[:-1]
     # title
     charturl += "&chtt="+title
@@ -32,7 +43,7 @@ def bhs(pl,title):
     chmstr = '&chm='
     i = 0
     for p in pl:
-        chmstr += 't'+p.timeStr()+',000000,0,'+str(i)+',13|'
+        chmstr += 't'+second2Str(p.time())+',000000,0,'+str(i)+',13|'
         i+=1
     chmstr = chmstr[:-1]
     charturl += chmstr
