@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
  update daily app usage
@@ -48,24 +49,37 @@ def createPatternList(sd):
     
 
 def update(filename):
-    patterndict = {'WindowsFileSystem':'^CabinetWClass',
-                   'Chrome':'^Chrome_',
-                   'IE':'^IEFrame.*Windows Internet Explorer\r$',
-                   'Python':'^TkTopLevel|^Shell_TrayWnd',
-                   'Notepad':'^Notepad',
-                   'Emacs':'^Emacs',
-                   'WindowsPhotoViewer':'^Photo_Lightweight_Viewer',
-                   'QQ':'TXGuiFoundation',
-                   'TTPlayer':'^TTPlayer_',
-                   'WindowsConsole':'^ConsoleWindowClass',
-                   'TortoiseSVN':'.*TortoiseSVN\r$',
-                   'GIMP':'.*GIMP\r$|^gdkWindowToplevel',
-                   'AdobeReader':'.*Adobe Reader\r$',
-                   'FunshionPlayer':'^funshion_player_tzdenjohn',
-                   'WindowsProgramManager':'^Progman Program Manager',
-                   'WindowsMediaPlayer':'^WMPlayerApp Windows Media Player',
-                   'OpenOffice':'.*OpenOffice.org Calc$',
-                   'DigitalPhotoProfessional':'^ATL:0043D110 Digital Photo Professional|^#32770 Digital Photo Professional'}
+    patterndict = {
+        # windows applications
+        'WindowsFileSystem':'^CabinetWClass',
+        'Chrome':'^Chrome_',
+        'IE':'^IEFrame.*Windows Internet Explorer\r$',
+        'Notepad':'^Notepad',
+        'WindowsPhotoViewer':'^Photo_Lightweight_Viewer',
+        'TTPlayer':'^TTPlayer_',
+        'WindowsConsole':'^ConsoleWindowClass',
+        'TortoiseSVN':'.*TortoiseSVN\r$',
+        'GIMP':'.*GIMP\r$|^gdkWindowToplevel',
+        'AdobeReader':'.*Adobe Reader\r$',
+        'FunshionPlayer':'^funshion_player_tzdenjohn',
+        'WindowsProgramManager':'^Progman Program Manager',
+        'WindowsMediaPlayer':'^WMPlayerApp Windows Media Player',
+        'OpenOffice':'.*OpenOffice.org Calc$',
+        'DigitalPhotoProfessional':'^ATL:0043D110 Digital Photo Professional|^#32770 Digital Photo Professional',
+        'StormPlayer':'^Afx:400000:3:10003:2:',
+        # Linux applications
+        'Firefox':'^ "Navigator", "Firefox"',
+        'GnomeTerminal':'^ "gnome-terminal"',
+        'Kpdf':'^ "kpdf"',
+        'Desktop':'^ "desktop_window"',
+        # Linux & Windows
+        'Emacs':'^Emacs|^ "emacs"',
+        'QQ':'^TXGuiFoundation|^ "qq"',
+        'OpenOffice':'^ "VCLSalFrame", "OpenOffice.org 3.0"',
+        'Skype':'^ "skype"',
+        'Pidgin':'^ "pidgin"',
+        'Python':'^TkTopLevel|^Shell_TrayWnd|^ "python"',
+        }
 
     pstart = Pattern('start','^start')
     pstop = Pattern('stop','^stop')
@@ -106,7 +120,7 @@ def update(filename):
                     ismatched = True
                     break
             if not ismatched:
-                #print title,
+                print title,
                 other.match(title)
                 pmatched = other
                 
