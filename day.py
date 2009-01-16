@@ -149,7 +149,7 @@ def updateApp(filename):
                     ismatched = True
                     break
             if not ismatched:
-                print title,
+                #print title,
                 other.match(title)
                 pmatched = other
                 
