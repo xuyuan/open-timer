@@ -72,9 +72,10 @@ class Category():
     def __cmp__(self, other):
         return other.time() - self.time()
 
-def updateApp(filename):
+def updateApp(filename,printunkown=False,checkcollision=True):
     appdict = {
         # windows applications
+        'StartMenue':'^DV2ControlHost',
         'WindowsFileSystem':'^CabinetWClass',
         'Chrome':'^Chrome_',
         'IE':'^IEFrame.*Windows Internet Explorer\r$',
@@ -84,12 +85,12 @@ def updateApp(filename):
         'WindowsConsole':'^ConsoleWindowClass',
         'TortoiseSVN':'.*TortoiseSVN\r$',
         'GIMP':'.*GIMP\r$|^gdkWindowToplevel',
-        'AdobeReader':'.*Adobe Reader\r$',
+        'AdobeReader':'.*Adobe Reader$',
         'FunshionPlayer':'^funshion_player_tzdenjohn',
         'WindowsProgramManager':'^Progman Program Manager',
         'WindowsMediaPlayer':'^WMPlayerApp Windows Media Player',
         'OpenOffice':'.*OpenOffice.org Calc$',
-        'DigitalPhotoProfessional':'^ATL:0043D110 Digital Photo Professional|^#32770 Digital Photo Professional',
+        'DigitalPhotoProfessional':r'^ATL:0043D110 Digital Photo Professional|^#32770 Digital Photo Professional|^#32770 IMG_\d{4}\.CR2',
         'StormPlayer':'^Afx:400000:3:10003:2:',
         'MSN':'^IMWindowClass|.*Windows Live Messenger$',
         # Linux applications
@@ -107,7 +108,8 @@ def updateApp(filename):
         'OpenOffice':'^ "VCLSalFrame", "OpenOffice.org 3.0"',
         'Skype':'^ "skype"',
         'Pidgin':'^ "pidgin"',
-        'Python':'^TkTopLevel|^Shell_TrayWnd|^ "python"'
+        'Python':'^TkTopLevel|^Shell_TrayWnd|^ "python"',
+        'Picasa':'^ytWindow'
         }
 
     pstart = Application('start','^start')
@@ -145,11 +147,16 @@ def updateApp(filename):
             lastmatched.addTime(dt)
             for a in applist:
                 if a.match(title):
+                    if checkcollision and ismatched:
+                        print 'App collision!!!', pmatched.name, ' : ' ,a.name
+                        print line
                     pmatched = a
                     ismatched = True
-                    break
+                    if not checkcollision:
+                        break
             if not ismatched:
-                #print title,
+                if printunkown:
+                    print line.decode('utf-8'),
                 other.match(title)
                 pmatched = other
                 
@@ -160,9 +167,9 @@ def updateApp(filename):
         line = f.readline()
 
     applist = removeZeroTime(applist)
-    applist.sort()
     if other.time() > 0 :
         applist.append(other)
+    applist.sort()
     
     #print
     #print
@@ -178,9 +185,10 @@ def updateCategory(applist):
         'PdfReader':'Kpdf|AdobeReader',
         'Console':'WindowsConsole|GnomeTerminal',
         'Messanger':'QQ|Pidgin|Skype|MSN',
-        'Video/Music':'StormPlayer|TTPlayer',
-        'SystemUtilities':'WindowsFileSystem|Nautilus|GnomeSetting|Yast',
-        'Office':'OpenOffice'
+        'Video/Music':'StormPlayer|TTPlayer|WindowsMediaPlayer',
+        'SystemUtilities':'WindowsFileSystem|Nautilus|GnomeSetting|Yast|WindowsProgramManager|StartMenue',
+        'Office':'OpenOffice',
+        'Photography':'DigitalPhotoProfessional|WindowsPhotoViewer|GIMP|Picasa'
         }
 
     categoryList = createListFromDict(Category,categoryDict)
@@ -193,6 +201,10 @@ def updateCategory(applist):
                 break
         if not ismatched:
             other.match(app)
+
+    #print other.name, ':'
+    #for o in other.apps:
+    #    print o.name, o.time()
     
     categoryList = removeZeroTime(categoryList)
     categoryList.sort()
