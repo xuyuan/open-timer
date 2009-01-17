@@ -72,18 +72,18 @@ class Category():
     def __cmp__(self, other):
         return other.time() - self.time()
 
-def updateApp(filename,printunkown=False,checkcollision=True):
+def updateApp(filename,printunkown=True,checkcollision=True):
     appdict = {
         # windows applications
         'StartMenue':'^DV2ControlHost',
-        'WindowsFileSystem':'^CabinetWClass',
+        'WindowsFileSystem':'^CabinetWClass|^#32770 正在复制 \d* 个项目|^#32770 删除文件',
         'Chrome':'^Chrome_',
-        'IE':'^IEFrame.*Windows Internet Explorer\r$',
+        'IE':'^IEFrame.*Windows Internet Explorer$',
         'Notepad':'^Notepad',
         'WindowsPhotoViewer':'^Photo_Lightweight_Viewer',
-        'TTPlayer':'^TTPlayer_',
+        'TTPlayer':'^TTPlayer_|^#32770 千千静听',
         'WindowsConsole':'^ConsoleWindowClass',
-        'TortoiseSVN':'.*TortoiseSVN\r$',
+        'TortoiseSVN':'.*TortoiseSVN$|.*- Commit - TortoiseSVN Finished!|^#32770 Commit -',
         'GIMP':'.*GIMP\r$|^gdkWindowToplevel',
         'AdobeReader':'.*Adobe Reader$',
         'FunshionPlayer':'^funshion_player_tzdenjohn',
