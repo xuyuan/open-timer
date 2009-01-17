@@ -72,7 +72,7 @@ class Category():
     def __cmp__(self, other):
         return other.time() - self.time()
 
-def updateApp(filename,printunkown=True,checkcollision=True):
+def updateApp(filename,printunkown=False,checkcollision=False):
     appdict = {
         # windows applications
         'StartMenue':'^DV2ControlHost',
@@ -188,7 +188,8 @@ def updateCategory(applist):
         'Video/Music':'StormPlayer|TTPlayer|WindowsMediaPlayer',
         'SystemUtilities':'WindowsFileSystem|Nautilus|GnomeSetting|Yast|WindowsProgramManager|StartMenue',
         'Office':'OpenOffice',
-        'Photography':'DigitalPhotoProfessional|WindowsPhotoViewer|GIMP|Picasa'
+        'Photography':'DigitalPhotoProfessional|WindowsPhotoViewer|GIMP|Picasa',
+        'DevTools':'TortoiseSVN|Python'
         }
 
     categoryList = createListFromDict(Category,categoryDict)
