@@ -49,6 +49,7 @@ class TimeCollector():
                 self.file.write(startline)
                 self.lasttitle = ''
                 self.startday = time.localtime().tm_mday
+		self.lasttime = time.time()
 
 	def getForegroundWindowTitleWindows(self):
 		w = win32gui.GetForegroundWindow()
@@ -56,7 +57,7 @@ class TimeCollector():
 		return unicode(title, 'gbk')
 
 	def getForegroundWindowTitleLinux(self):
-		s = subprocess.Popen('./window-title', stdout=subprocess.PIPE).communicate()[0]
+		s = subprocess.Popen(['sh', './window-title'], stdout=subprocess.PIPE).communicate()[0]
 		title = s.replace('\n',' ')
 		return unicode(title, sys.stdin.encoding)
                 
@@ -66,7 +67,9 @@ class TimeCollector():
                         self.openDataFile()
                         
                 title = self.getForegroundWindowTitle()
-                if not title == self.lasttitle:
+		lasttime = self.lasttime
+		self.lasttime = time.time()
+                if (not title == self.lasttitle) or (self.lasttime -lasttime > 60):
                         data = hhmmss()+'\t'+title+'\n'
                         self.file.write(data)
 			self.flushData()
