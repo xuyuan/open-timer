@@ -63,13 +63,13 @@ class TimeCollector():
                 
         def collect(self):
                 day = time.localtime().tm_mday
-                if not self.startday == day:
+		lasttime = self.lasttime
+		self.lasttime = time.time()
+                if (not self.startday == day) or (self.lasttime -lasttime > 60):
                         self.openDataFile()
                         
                 title = self.getForegroundWindowTitle()
-		lasttime = self.lasttime
-		self.lasttime = time.time()
-                if (not title == self.lasttitle) or (self.lasttime -lasttime > 60):
+                if not title == self.lasttitle:
                         data = hhmmss()+'\t'+title+'\n'
                         self.file.write(data)
 			self.flushData()
