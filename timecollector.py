@@ -32,8 +32,8 @@ def checkDataDir():
         makeSureDir(datadir)
         return datadir
 
-def hhmmss():
-        return time.strftime("%H:%M:%S",time.localtime())
+def hhmmss(t):
+        return time.strftime("%H:%M:%S",t)
 
 class TimeCollector():
         def __init__(self):
@@ -45,11 +45,13 @@ class TimeCollector():
                 self.closeDataFile()
                 filename = checkDataDir() + time.strftime("/%d.txt",time.localtime())
                 self.file = codecs.open( filename, "a", "utf-8" )
-                startline = 'start\t'+hhmmss()+'\t'+' '.join(platform.uname())+' '+''.join(platform.dist())+'\n'
+		self.lastlocaltime = time.localtime()
+                startline = 'start\t'+hhmmss(self.lastlocaltime)+'\t'+' '.join(platform.uname())+' '+''.join(platform.dist())+'\n'
                 self.file.write(startline)
                 self.lasttitle = ''
                 self.startday = time.localtime().tm_mday
 		self.lasttime = time.time()
+		
 
 	def getForegroundWindowTitleWindows(self):
 		w = win32gui.GetForegroundWindow()
@@ -70,7 +72,8 @@ class TimeCollector():
                         
                 title = self.getForegroundWindowTitle()
                 if not title == self.lasttitle:
-                        data = hhmmss()+'\t'+title+'\n'
+			self.lastlocaltime = time.localtime()
+                        data = hhmmss(self.lastlocaltime)+'\t'+title+'\n'
                         self.file.write(data)
 			self.flushData()
 			self.lasttitle = title
@@ -82,7 +85,7 @@ class TimeCollector():
 
         def closeDataFile(self):
                 if not None == self.file and not self.file.closed:
-                        stopline = 'stop\t'+hhmmss()+'\n'
+                        stopline = 'stop\t'+hhmmss(self.lastlocaltime)+'\n'
                         self.file.write(stopline)
                         self.flushData()
                         self.file.close()
