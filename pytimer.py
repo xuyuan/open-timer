@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+"""
+ main for linux
+"""
+__author__ = 'Xu, Yuan'
+
 
 import sys, os
 from daemon import Daemon
