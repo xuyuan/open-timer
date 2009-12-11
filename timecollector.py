@@ -24,8 +24,7 @@ def makeSureDir(dir):
                 os.mkdir(dir)
 
 def checkDataDir():
-        datadir = os.getenv('HOME')+"/.pytimer"
-        makeSureDir(datadir)
+        datadir =  os.path.dirname( os.path.realpath( __file__) )
 	datadir += "/data"
 	makeSureDir(datadir)
         datadir += time.strftime("/%Y",time.localtime())

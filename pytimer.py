@@ -27,6 +27,8 @@ if __name__ == "__main__":
 			usage()
 			sys.exit(2)
 		sys.exit(0)
+	elif len(sys.argv) == 1:
+		daemon.start()
 	else:
 		usage()
 		sys.exit(2)

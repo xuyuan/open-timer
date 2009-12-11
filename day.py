@@ -218,7 +218,7 @@ def updateCategory(applist):
 def main(argv):
     file = None
     if len(argv) == 0:
-        file = time.strftime(os.getenv('HOME')+'/.pytimer/data/%Y/%m/%d.txt', time.localtime())
+        file = time.strftime(os.path.dirname( os.path.realpath( __file__))+'/data/%Y/%m/%d.txt', time.localtime())
     else:
         file = argv[0]
 
