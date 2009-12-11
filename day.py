@@ -9,6 +9,7 @@ import re
 import time
 import webbrowser
 import sys
+import os
 import googlechart
 
 class Application():
@@ -217,7 +218,7 @@ def updateCategory(applist):
 def main(argv):
     file = None
     if len(argv) == 0:
-        file = time.strftime('data/%Y/%m/%d.txt', time.localtime())
+        file = time.strftime(os.getenv('HOME')+'/.pytimer/data/%Y/%m/%d.txt', time.localtime())
     else:
         file = argv[0]
 

@@ -24,8 +24,10 @@ def makeSureDir(dir):
                 os.mkdir(dir)
 
 def checkDataDir():
-        datadir = "data"
+        datadir = os.getenv('HOME')+"/.pytimer"
         makeSureDir(datadir)
+	datadir += "/data"
+	makeSureDir(datadir)
         datadir += time.strftime("/%Y",time.localtime())
         makeSureDir(datadir)
         datadir += time.strftime("/%m",time.localtime())
@@ -37,7 +39,8 @@ def hhmmss(t):
 
 class TimeCollector():
         def __init__(self):
-                self.file = None
+		self.file = None
+		self.linuxScript = os.path.dirname( os.path.realpath( __file__) )+'/window-title'
 		self.getForegroundWindowTitle = getattr(self, 'getForegroundWindowTitle'+platform.system())
                 self.openDataFile()
 
@@ -59,7 +62,7 @@ class TimeCollector():
 		return unicode(title, 'gbk')
 
 	def getForegroundWindowTitleLinux(self):
-		s = subprocess.Popen(['sh', './window-title'], stdout=subprocess.PIPE).communicate()[0]
+		s = subprocess.Popen(['sh', self.linuxScript], stdout=subprocess.PIPE).communicate()[0]
 		title = s.replace('\n',' ')
 		return unicode(title, sys.stdin.encoding)
                 

@@ -9,6 +9,7 @@ Dependence:
 __author__ = 'Xu, Yuan'
 
 import sys
+import os
 import wx
 from timecollector import TimeCollector
 import day
@@ -37,7 +38,8 @@ class TimeSaver(wx.Frame):
         size = (500, 500)
         wx.Frame.__init__(self, parent=None, title=title, size=size)
 
-        self.icon = wx.Icon('logo.png',wx.BITMAP_TYPE_PNG)
+        self.icon = wx.Icon(os.path.dirname( os.path.realpath( __file__ ) )
++'/logo.png',wx.BITMAP_TYPE_PNG)
         self.SetIcon(self.icon)
         
         # then initial a panel
