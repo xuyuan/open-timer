@@ -10,7 +10,7 @@ import time
 import webbrowser
 import sys
 import os
-import googlechart
+from viz import gviz_api, PieChart, Table, Html
 
 class Application():
     def __init__(self, n, s):
@@ -223,13 +223,39 @@ def main(argv):
         file = argv[0]
 
     pl = updateApp(file)
-    cl = updateCategory(pl)
-        
-    # draw figure
-    charturl = googlechart.bhs(pl,'Your time @ '+file+' (Application)')
-    webbrowser.open(charturl)
-    charturl = googlechart.bhs(cl,'Your time @ '+file+' (Category)')
-    webbrowser.open(charturl)
+    cl = updateCategory(pl)        
+
+    # Creating the data
+    description = {"Application Name": ("string", "Application Name"),
+                   "Time": ("number", "Time")}
+    data = []
+    for p in pl:
+        data.append({"Application Name": p.name, "Time": p.time()})
+
+    data_table = gviz_api.DataTable(description)
+    data_table.LoadData(data)
+
+    tbl = Table.Table('Application Time', data_table)
+    html = Html.Html('Day')
+    html.add(tbl)
+
+    ##############
+    description = {"Name": ("string", "Category Name"),
+                   "Time": ("number", "Time")}
+    data = []
+    for p in cl:
+        data.append({"Name": p.name, "Time": p.time()})
+
+    data_table = gviz_api.DataTable(description)
+    data_table.LoadData(data)
+
+    tbl = PieChart.PieChart('Category Time', data_table)
+    html.add(tbl)
+
+    #print html.all()
+    filename = os.path.dirname(os.path.realpath( __file__))+"/tmp/day.html"
+    html.write( filename )
+    webbrowser.open(filename)
 
 if __name__=="__main__":
     main(sys.argv[1:])
