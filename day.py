@@ -7,7 +7,6 @@ __author__ = 'Xu, Yuan'
 
 import re
 import time
-import webbrowser
 import sys
 import os
 from viz import gviz_api, PieChart, Table, Html
@@ -73,189 +72,193 @@ class Category():
     def __cmp__(self, other):
         return other.time() - self.time()
 
-def updateApp(filename,printunkown=False,checkcollision=False):
-    appdict = {
-        # windows applications
-        'StartMenue':'^DV2ControlHost',
-        'WindowsFileSystem':'^CabinetWClass|^#32770 正在复制 \d* 个项目|^#32770 删除文件',
-        'Chrome':'^Chrome_',
-        'IE':'^IEFrame.*Windows Internet Explorer$',
-        'Notepad':'^Notepad',
-        'WindowsPhotoViewer':'^Photo_Lightweight_Viewer',
-        'TTPlayer':'^TTPlayer_|^#32770 千千静听',
-        'WindowsConsole':'^ConsoleWindowClass',
-        'TortoiseSVN':'.*TortoiseSVN$|.*- Commit - TortoiseSVN Finished!|^#32770 Commit -',
-        'GIMP':'.*GIMP\r$|^gdkWindowToplevel',
-        'AdobeReader':'.*Adobe Reader$',
-        'FunshionPlayer':'^funshion_player_tzdenjohn',
-        'WindowsProgramManager':'^Progman Program Manager',
-        'WindowsMediaPlayer':'^WMPlayerApp Windows Media Player',
-        'OpenOffice':'.*OpenOffice.org Calc$',
-        'DigitalPhotoProfessional':r'^ATL:0043D110 Digital Photo Professional|^#32770 Digital Photo Professional|^#32770 IMG_\d{4}\.CR2',
-        'StormPlayer':'^Afx:400000:3:10003:2:',
-        'MSN':'^IMWindowClass|.*Windows Live Messenger$',
-        # Linux applications
-        'Firefox':'^ "Navigator", "Firefox"|^ "Dialog", "Firefox"',
-        'GnomeTerminal':'^ "gnome-terminal"',
-        'Kpdf':'^ "kpdf"',
-        'Desktop':'^ "desktop_window"',
-        'Nautilus':'^ "nautilus"|^ "file_properties", "Nautilus"',
-        'Gedit':'^ "gedit"',
-        'GnomeSetting':'^ "gnome-control-center"|^ "gnome-appearance-properties"',
-        'Yast':'^ "y2controlcenter-gnome"|^ "y2base"',
-        # Linux & Windows
-        'Emacs':'^Emacs|^ "emacs"',
-        'QQ':'^TXGuiFoundation|^ "qq"',
-        'OpenOffice':'^ "VCLSalFrame", "OpenOffice.org 3.0"',
-        'Skype':'^ "skype"',
-        'Pidgin':'^ "pidgin"',
-        'Python':'^TkTopLevel|^Shell_TrayWnd|^ "python"',
-        'Picasa':'^ytWindow'
-        }
-
-    pstart = Application('start','^start')
-    pstop = Application('stop','^stop')
-    other = Application('other','.')
-
-    applist = createListFromDict(Application,appdict)
-    
-    
-    f = open(filename,'r')
-    line = f.readline()
-    laststs = None
-    lastmatched = pstart
-    while len(line) > 0:
-        pmatched = None
-        #print line,
-        st = laststs
-        if pstart.match(line):
-            st = time.strptime(line[6:14],"%H:%M:%S")
-            pmatched = pstart
-            laststs = st.tm_hour*3600+st.tm_min*60+st.tm_sec
-        elif pstop.match(line):
-            st = time.strptime(line[5:13],"%H:%M:%S")
-            pmatched = pstop
-            sts = st.tm_hour*3600+st.tm_min*60+st.tm_sec
-            dt = sts - laststs
-            lastmatched.addTime(dt)
-            laststs = sts
+class Day():
+    def __init__(self, year=0, month=0, day=0):
+        if day == 0:
+            self.filename = time.strftime(os.path.dirname( os.path.realpath( __file__))+'/data/%Y/%m/%d.txt', time.localtime())
         else:
-            ismatched = False
-            title = line[9:]
-            st = time.strptime(line[:8],"%H:%M:%S")
-            sts = st.tm_hour*3600+st.tm_min*60+st.tm_sec
-            dt = sts - laststs
-            lastmatched.addTime(dt)
-            for a in applist:
-                if a.match(title):
-                    if checkcollision and ismatched:
-                        print 'App collision!!!', pmatched.name, ' : ' ,a.name
-                        print line
-                    pmatched = a
-                    ismatched = True
-                    if not checkcollision:
-                        break
-            if not ismatched:
-                if printunkown:
-                    print line.decode('utf-8'),
-                other.match(title)
-                pmatched = other
+            self.filename = os.path.dirname( os.path.realpath( __file__))+'/data/%(year)d/%(month)d/%(day)d.txt' % vars()
+        self.update()
+
+    def updateApp(self,printunkown=False,checkcollision=False):
+        appdict = {
+            # windows applications
+            'StartMenue':'^DV2ControlHost',
+            'WindowsFileSystem':'^CabinetWClass|^#32770 正在复制 \d* 个项目|^#32770 删除文件',
+            'Chrome':'^Chrome_',
+            'IE':'^IEFrame.*Windows Internet Explorer$',
+            'Notepad':'^Notepad',
+            'WindowsPhotoViewer':'^Photo_Lightweight_Viewer',
+            'TTPlayer':'^TTPlayer_|^#32770 千千静听',
+            'WindowsConsole':'^ConsoleWindowClass',
+            'TortoiseSVN':'.*TortoiseSVN$|.*- Commit - TortoiseSVN Finished!|^#32770 Commit -',
+            'GIMP':'.*GIMP\r$|^gdkWindowToplevel',
+            'AdobeReader':'.*Adobe Reader$',
+            'FunshionPlayer':'^funshion_player_tzdenjohn',
+            'WindowsProgramManager':'^Progman Program Manager',
+            'WindowsMediaPlayer':'^WMPlayerApp Windows Media Player',
+            'OpenOffice':'.*OpenOffice.org Calc$',
+            'DigitalPhotoProfessional':r'^ATL:0043D110 Digital Photo Professional|^#32770 Digital Photo Professional|^#32770 IMG_\d{4}\.CR2',
+            'StormPlayer':'^Afx:400000:3:10003:2:',
+            'MSN':'^IMWindowClass|.*Windows Live Messenger$',
+            # Linux applications
+            'Firefox':'^ "Navigator", "Firefox"|^ "Dialog", "Firefox"',
+            'GnomeTerminal':'^ "gnome-terminal"',
+            'Kpdf':'^ "kpdf"',
+            'Desktop':'^ "desktop_window"',
+            'Nautilus':'^ "nautilus"|^ "file_properties", "Nautilus"',
+            'Gedit':'^ "gedit"',
+            'GnomeSetting':'^ "gnome-control-center"|^ "gnome-appearance-properties"',
+            'Yast':'^ "y2controlcenter-gnome"|^ "y2base"',
+            # Linux & Windows
+            'Emacs':'^Emacs|^ "emacs"',
+            'QQ':'^TXGuiFoundation|^ "qq"',
+            'OpenOffice':'^ "VCLSalFrame", "OpenOffice.org 3.0"',
+            'Skype':'^ "skype"',
+            'Pidgin':'^ "pidgin"',
+            'Python':'^TkTopLevel|^Shell_TrayWnd|^ "python"',
+            'Picasa':'^ytWindow'
+            }
+    
+        pstart = Application('start','^start')
+        pstop = Application('stop','^stop')
+        other = Application('other','.')
+
+        applist = createListFromDict(Application,appdict)
+    
+        try:
+            f = open(self.filename,'r')
+
+            line = f.readline()
+            laststs = None
+            lastmatched = pstart
+            while len(line) > 0:
+                pmatched = None
+            #print line,
+                st = laststs
+                if pstart.match(line):
+                    st = time.strptime(line[6:14],"%H:%M:%S")
+                    pmatched = pstart
+                    laststs = st.tm_hour*3600+st.tm_min*60+st.tm_sec
+                elif pstop.match(line):
+                    st = time.strptime(line[5:13],"%H:%M:%S")
+                    pmatched = pstop
+                    sts = st.tm_hour*3600+st.tm_min*60+st.tm_sec
+                    dt = sts - laststs
+                    lastmatched.addTime(dt)
+                    laststs = sts
+                else:
+                    ismatched = False
+                    title = line[9:]
+                    st = time.strptime(line[:8],"%H:%M:%S")
+                    sts = st.tm_hour*3600+st.tm_min*60+st.tm_sec
+                    dt = sts - laststs
+                    lastmatched.addTime(dt)
+                    for a in applist:
+                        if a.match(title):
+                            if checkcollision and ismatched:
+                                print 'App collision!!!', pmatched.name, ' : ' ,a.name
+                                print line
+                            pmatched = a
+                            ismatched = True
+                            if not checkcollision:
+                                break
+                    if not ismatched:
+                        if printunkown:
+                            print line.decode('utf-8'),
+                        other.match(title)
+                        pmatched = other
+                        
+                    laststs = sts
+                    lastmatched = pmatched
                 
-            laststs = sts
-            lastmatched = pmatched
+                    
+                line = f.readline()
         
-            
-        line = f.readline()
+        except IOError:
+            pass
 
-    applist = removeZeroTime(applist)
-    if other.time() > 0 :
-        applist.append(other)
-    applist.sort()
+        applist = removeZeroTime(applist)
+        if other.time() > 0 :
+            applist.append(other)
+        applist.sort()
+
+            #print
+            #print
+            #for p in patternlist:
+            #    print p.name, p.count, p.time/60.0
+        
+        return applist
     
-    #print
-    #print
-    #for p in patternlist:
-    #    print p.name, p.count, p.time/60.0
-
-    return applist
-
-def updateCategory(applist):
-    categoryDict = {
-        'InternetBrowser':'Firefox|Chrome|IE',
-        'Editor':'Emacs|Notepad|Gedit',
-        'PdfReader':'Kpdf|AdobeReader',
-        'Console':'WindowsConsole|GnomeTerminal',
-        'Messanger':'QQ|Pidgin|Skype|MSN',
-        'Video/Music':'StormPlayer|TTPlayer|WindowsMediaPlayer',
-        'SystemUtilities':'WindowsFileSystem|Nautilus|GnomeSetting|Yast|WindowsProgramManager|StartMenue',
-        'Office':'OpenOffice',
-        'Photography':'DigitalPhotoProfessional|WindowsPhotoViewer|GIMP|Picasa',
-        'DevTools':'TortoiseSVN|Python'
-        }
-
-    categoryList = createListFromDict(Category,categoryDict)
-    other = Category('Uncategorized','.')
-    for app in applist:
-        ismatched = False
-        for c in categoryList:
-            if c.match(app):
-                ismatched = True
-                break
-        if not ismatched:
-            other.match(app)
-
-    #print other.name, ':'
-    #for o in other.apps:
-    #    print o.name, o.time()
+    def updateCategory(self, applist):
+        categoryDict = {
+            'InternetBrowser':'Firefox|Chrome|IE',
+            'Editor':'Emacs|Notepad|Gedit',
+            'PdfReader':'Kpdf|AdobeReader',
+            'Console':'WindowsConsole|GnomeTerminal',
+            'Messanger':'QQ|Pidgin|Skype|MSN',
+            'Video/Music':'StormPlayer|TTPlayer|WindowsMediaPlayer',
+            'SystemUtilities':'WindowsFileSystem|Nautilus|GnomeSetting|Yast|WindowsProgramManager|StartMenue',
+            'Office':'OpenOffice',
+            'Photography':'DigitalPhotoProfessional|WindowsPhotoViewer|GIMP|Picasa',
+            'DevTools':'TortoiseSVN|Python'
+            }
     
-    categoryList = removeZeroTime(categoryList)
-    categoryList.sort()
-    if other.time() > 0 :
-        categoryList.append(other)
+        categoryList = createListFromDict(Category,categoryDict)
+        other = Category('Uncategorized','.')
+        for app in applist:
+            ismatched = False
+            for c in categoryList:
+                if c.match(app):
+                    ismatched = True
+                    break
+            if not ismatched:
+                other.match(app)
+    
+        #print other.name, ':'
+        #for o in other.apps:
+        #    print o.name, o.time()
+        
+        categoryList = removeZeroTime(categoryList)
+        categoryList.sort()
+        if other.time() > 0 :
+            categoryList.append(other)
+    
+        return categoryList
+    
+    def update(self):
+        pl = self.updateApp()
+        cl = self.updateCategory(pl)
+    
+        # Creating the data
+        description = {"Application Name": ("string", "Application Name"),
+                       "Time": ("number", "Time")}
+        data = []
+        for p in pl:
+            data.append({"Application Name": p.name, "Time": p.time()})
+    
+        self.appData = gviz_api.DataTable(description)
+        self.appData.LoadData(data)
+    
+        ##############
+        description = {"Name": ("string", "Category Name"),
+                       "Time": ("number", "Time")}
+        data = []
+        for p in cl:
+            data.append({"Name": p.name, "Time": p.time()})
+    
+        self.categoryData = gviz_api.DataTable(description)
+        self.categoryData.LoadData(data)
+    
+    def main(self):
+        html = Html.Html('Day')
+        tbl = Table.Table('Application Time', self.appData)
+        html.add(tbl)
+        pie = PieChart.PieChart('Category Time', self.categoryData)
+        html.add(pie)
+    
+        return html.all()
 
-    return categoryList
-
-def main(argv):
-    file = None
-    if len(argv) == 0:
-        file = time.strftime(os.path.dirname( os.path.realpath( __file__))+'/data/%Y/%m/%d.txt', time.localtime())
-    else:
-        file = argv[0]
-
-    pl = updateApp(file)
-    cl = updateCategory(pl)        
-
-    # Creating the data
-    description = {"Application Name": ("string", "Application Name"),
-                   "Time": ("number", "Time")}
-    data = []
-    for p in pl:
-        data.append({"Application Name": p.name, "Time": p.time()})
-
-    data_table = gviz_api.DataTable(description)
-    data_table.LoadData(data)
-
-    tbl = Table.Table('Application Time', data_table)
-    html = Html.Html('Day')
-    html.add(tbl)
-
-    ##############
-    description = {"Name": ("string", "Category Name"),
-                   "Time": ("number", "Time")}
-    data = []
-    for p in cl:
-        data.append({"Name": p.name, "Time": p.time()})
-
-    data_table = gviz_api.DataTable(description)
-    data_table.LoadData(data)
-
-    tbl = PieChart.PieChart('Category Time', data_table)
-    html.add(tbl)
-
-    #print html.all()
-    filename = os.path.dirname(os.path.realpath( __file__))+"/tmp/day.html"
-    html.write( filename )
-    webbrowser.open(filename)
 
 if __name__=="__main__":
-    main(sys.argv[1:])
+    print main(sys.argv[1:])
