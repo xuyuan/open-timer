@@ -9,7 +9,6 @@ import re
 import time
 import sys
 import os
-from viz import gviz_api, PieChart, Table, Html
 
 class Application():
     def __init__(self, n, s):
@@ -227,39 +226,6 @@ class Day():
         return categoryList
     
     def update(self):
-        pl = self.updateApp()
-        cl = self.updateCategory(pl)
-        self.categoryList = cl
-    
-        # Creating the data
-        description = {"Application Name": ("string", "Application Name"),
-                       "Time": ("number", "Time")}
-        data = []
-        for p in pl:
-            data.append({"Application Name": p.name, "Time": p.time()})
-    
-        self.appData = gviz_api.DataTable(description)
-        self.appData.LoadData(data)
-    
-        ##############
-        description = {"Name": ("string", "Category Name"),
-                       "Time": ("number", "Time")}
-        data = []
-        for p in cl:
-            data.append({"Name": p.name, "Time": p.time()})
-    
-        self.categoryData = gviz_api.DataTable(description)
-        self.categoryData.LoadData(data)
-    
-    def main(self):
-        html = Html.Html('Day')
-        tbl = Table.Table('Application Time', self.appData)
-        html.add(tbl)
-        pie = PieChart.PieChart('Category Time', self.categoryData)
-        html.add(pie)
-    
-        return html.all()
+        self.applicationList = self.updateApp()
+        self.categoryList = self.updateCategory(self.applicationList)
 
-
-if __name__=="__main__":
-    print main(sys.argv[1:])
