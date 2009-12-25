@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
- simple web server for dashboard
+simple web server for dashboard
 """
 __author__ = 'Xu, Yuan'
 
@@ -10,34 +10,32 @@ from os import curdir, sep, path
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 import imp
 from day import Day
+from OpenFlashChart import Chart
+
+theDay = None
 
 class PytimerHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         try:
-            if self.path.endswith(".html"):
-                f = open(curdir + sep + self.path)
+            filename = self.path
+            if filename.endswith(".html") or filename.endswith(".css") or filename.endswith(".js") or filename.endswith(".swf") or filename.endswith(".png"):
+                f = open(curdir + sep + filename)
                 self.send_response(200)
-                self.send_header('Content-type',	'text/html')
+                self.send_header('Content-type', 'text/'+filename[filename.rfind('.')+1:])
                 self.end_headers()
                 self.wfile.write(f.read())
                 f.close()
                 return
             else:   #our dynamic content
-                self.send_response(200)
-                self.send_header('Content-type',	'text/html')
-                self.end_headers()
-                cmd = self.path[1:]
-                print cmd
-                s = eval(cmd)
-                self.wfile.write(s)
+                self.executeCommand()
                 return
-                
+            
             return
-                
+        
         except IOError:
             self.send_error(404,'File Not Found: %s' % self.path)
-     
+            
 
     def do_POST(self):
         global rootnode
@@ -55,6 +53,45 @@ class PytimerHandler(BaseHTTPRequestHandler):
             
         except :
             pass
+
+    def do_OPTIONS(self):
+        self.executeCommand()
+
+    def executeCommand(self):
+        global theDay
+        self.send_response(200)
+        self.send_header('Content-type', 'text/html')
+        self.end_headers()
+        cmd = self.path[1:]
+        print cmd
+        if cmd.find('=') == -1 :
+            s = eval(cmd)
+            self.wfile.write(s)
+        else:
+            exec cmd
+            self.wfile.write("exec "+cmd)
+
+    def setDay(self, yy, mm, dd):
+        global theDay
+        theDay = Day(yy,mm,dd)
+
+    def test(self):
+        global theDay
+        if theDay is None :
+            print 'new day'
+            theDay = Day()
+        chart = Chart()
+        chart.type = "pie"
+        chart.tip = "#val# of #total#<br>#percent# of 100%"
+        chart.values = []
+        for v in theDay.categoryList:
+            chart.values.append({"value": v.time(), "label": v.name})
+
+        c = Chart()
+        c.title.text = "Category Time"
+        c.elements = [chart]
+        return c.create()
+        
 
 def main():
     try:

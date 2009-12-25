@@ -229,6 +229,7 @@ class Day():
     def update(self):
         pl = self.updateApp()
         cl = self.updateCategory(pl)
+        self.categoryList = cl
     
         # Creating the data
         description = {"Application Name": ("string", "Application Name"),
