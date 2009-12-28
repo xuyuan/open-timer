@@ -10,7 +10,7 @@ from os import curdir, sep, path
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 import imp
 from day import Day
-from OpenFlashChart import Chart
+from OpenFlashChart import Chart, Pie
 
 theDay = None
 
@@ -75,23 +75,11 @@ class PytimerHandler(BaseHTTPRequestHandler):
         global theDay
         theDay = Day(yy,mm,dd)
 
-    def test(self):
+    def getDay(self):
         global theDay
         if theDay is None :
-            print 'new day'
             theDay = Day()
-        chart = Chart()
-        chart.type = "pie"
-        chart.tip = "#val# of #total#<br>#percent# of 100%"
-        chart.values = []
-        for v in theDay.categoryList:
-            chart.values.append({"value": v.time(), "label": v.name})
-
-        c = Chart()
-        c.title.text = "Category Time"
-        c.elements = [chart]
-        return c.create()
-        
+        return theDay
 
 def main():
     try:

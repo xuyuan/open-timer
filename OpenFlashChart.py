@@ -76,3 +76,19 @@ class Chart(dict):
 			return cjson.encode(attributes)
 
 
+#################################################################
+class Pie():
+	def __init__(self, data):
+		pie = Chart()
+		pie.type = "pie"
+		pie.tip = "#val# of #total#<br>#percent# of 100%"
+		pie.colours = ["ff3333", "#33ff66", "#0066cc"]
+		pie.values = []
+		for v in data :
+			pie.values.append({"value": v.time(), "label": v.name})
+		self.chart = Chart()
+		self.chart.bg_colour = '#FFFFFF'
+		self.chart.elements = [pie]
+
+	def json(self):
+		return self.chart.create()

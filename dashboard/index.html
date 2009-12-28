@@ -1,19 +1,23 @@
 <!doctype html>
 <html lang="en">
 <head>
-	<title>jQuery UI Datepicker - Format date</title>
+	<title>PyTimer - Dashboard</title>
 	<link type="text/css" href="themes/base/ui.all.css" rel="stylesheet" />
 	<script type="text/javascript" src="js/swfobject.js"></script>
 	<script type="text/javascript" src="js/jquery-1.3.2.js"></script>
 	<script type="text/javascript" src="js/ui/ui.core.js"></script>
 	<script type="text/javascript" src="js/ui/ui.datepicker.js"></script>
+	<script type="text/javascript" src="js/ui/ui.draggable.js"></script>
 	<link type="text/css" href="demos.css" rel="stylesheet" />
 	<script type="text/javascript">
 
 	function reload()
 	{
-		tmp = findSWF("Category Time");
-		x = tmp.reload("http://localhost:8080/self.test()");
+		tmp = findSWF("Category Time Chart");
+		x = tmp.reload("/Pie(self.getDay().categoryList).json()");
+
+		tmp = findSWF("Application Time Chart");
+		x = tmp.reload("/Pie(self.getDay().applicationList).json()");
 	}
 
 	function findSWF(movieName) {
@@ -29,7 +33,7 @@
 		$("#datepicker").datepicker({
 				dateFormat: 'yy,mm,dd',
 				onSelect: function(dateText, inst) {
-						var path = 'http://localhost:8080/self.setDay('+dateText+')';
+						var path = '/self.setDay('+dateText+')';
 						$.get(path, function(data) {} );
 						reload();
 						}
@@ -38,21 +42,42 @@
 	</script>
 
 	<script type="text/javascript">
-	swfobject.embedSWF(
-  	"open-flash-chart.swf", "Category Time", "550", "200",
-  	"9.0.0", "expressInstall.swf",
-  	{"data-file":"http://localhost:8080/self.test()"}
-  	);
+		$(function() {
+			$("#CategoryTime").draggable();
+			$("#ApplicationTime").draggable();
+		});
+	</script>
+
+	<script type="text/javascript">
+		swfobject.embedSWF(
+  		"open-flash-chart.swf", "Category Time Chart", "400", "300",
+  		"9.0.0", "expressInstall.swf",
+  		{"data-file":"/Pie(self.getDay().categoryList).json()"}
+  		);
+
+		swfobject.embedSWF(
+  		"open-flash-chart.swf", "Application Time Chart", "400", "300",
+  		"9.0.0", "expressInstall.swf",
+  		{"data-file":"/Pie(self.getDay().applicationList).json()"}
+  		);
 	</script>
 
 </head>
 <body>
 
 <div class="demo">
-
-<H1>Category Time</H1><div id ="Category Time"></div>
-
 <p>Date: <input type="text" id="datepicker" size="30"/></p>
+
+<div id="CategoryTime" class="ui-widget-content">
+<H2>&nbsp Category Time</H2>
+<div id ="Category Time Chart"></div>
+</div>
+
+<div id="ApplicationTime" class="ui-widget-content">
+<H2>&nbsp Application Time</H2>
+<div id ="Application Time Chart"></div>
+</div>
+
 
 </div><!-- End demo -->
 
