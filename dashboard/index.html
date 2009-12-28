@@ -14,18 +14,23 @@
 	<script type="text/javascript">
 
 		var CategoryTimeSetting = "Pie";
-
+		var ApplicationTimeSetting = "Pie";
 		function reloadCategoryTime()
 		{
 			tmp = findSWF("Category Time Chart");
 			x = tmp.reload("/"+CategoryTimeSetting+"(self.getData().categoryList).json()");
 		}
 
+		function reloadApplicationTime()
+		{
+			tmp = findSWF("Application Time Chart");
+			x = tmp.reload("/"+ApplicationTimeSetting+"(self.getData().applicationList).json()");
+		}
+
 		function reload()
 		{
 			reloadCategoryTime();
-			tmp = findSWF("Application Time Chart");
-			x = tmp.reload("/Pie(self.getData().applicationList).json()");
+			reloadApplicationTime();
 		}
 
 		function findSWF(movieName) {
@@ -81,10 +86,16 @@
 				}
 			});
 
-			$('#CategoryTimeSetting').menu({hoverOpenDelay:100,
+			$('#CategoryTimeSetting').menu({
 				onClick: function(e, menuItem){
 					CategoryTimeSetting = $(this).text();
 					reloadCategoryTime();
+				}}); 
+
+			$('#ApplicationTimeSetting').menu({
+				onClick: function(e, menuItem){
+					ApplicationTimeSetting = $(this).text();
+					reloadApplicationTime();
 				}}); 
 		});
 	</script>
@@ -99,7 +110,7 @@
 		swfobject.embedSWF(
   		"open-flash-chart.swf", "Application Time Chart", "400", "300",
   		"9.0.0", "expressInstall.swf",
-  		{"data-file":"/Pie(self.getData().applicationList).json()"}
+  		{"data-file":"/"+ApplicationTimeSetting+"(self.getData().applicationList).json()"}
   		);
 	</script>
 
@@ -136,13 +147,18 @@
 						<li>Bar</li>
 					</ul>
 				</div>
-
 			</div>
 		</li>
 		<li class="ui-state-default">
 			<div>
 				<H2>&nbsp Application Time</H2>
 				<div id ="Application Time Chart"></div>
+				<div id="ApplicationTimeSetting">Setting
+					<ul>
+						<li>Pie</li>
+						<li>Bar</li>
+					</ul>
+				</div>
 			</div>
 		</li>
 	</ul>

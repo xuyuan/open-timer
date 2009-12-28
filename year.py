@@ -16,4 +16,6 @@ class Year():
             result = Month(year, i)
             self.applicationList = mergeAppDataList(self.applicationList, result.applicationList)
             self.categoryList = mergeCateoryList(self.categoryList, result.categoryList)
+        self.applicationList.sort()
+        self.categoryList.sort()
         self.info = "%(year)d" % vars()
