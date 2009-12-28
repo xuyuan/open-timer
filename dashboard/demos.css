@@ -333,5 +333,5 @@ div.demo-description {
 #widget-docs .ui-widget-content a:active { color:#0b559b; }
 
 /** add by xy */
-#CategoryTime { width: 400px; padding: 0.1em; background: #008899; }
-#ApplicationTime { width: 400px; padding: 0.1em; background: #008899; }
+#sortable { list-style-type: none; margin: 0; padding: 0; }
+#sortable li { margin: 3px 3px 3px 0; padding: 1px; float: left; }

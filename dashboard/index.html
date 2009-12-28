@@ -8,6 +8,7 @@
 	<script type="text/javascript" src="js/ui/ui.core.js"></script>
 	<script type="text/javascript" src="js/ui/ui.datepicker.js"></script>
 	<script type="text/javascript" src="js/ui/ui.draggable.js"></script>
+	<script type="text/javascript" src="js/ui/ui.sortable.js"></script>
 	<link type="text/css" href="demos.css" rel="stylesheet" />
 	<script type="text/javascript">
 
@@ -43,8 +44,8 @@
 
 	<script type="text/javascript">
 		$(function() {
-			$("#CategoryTime").draggable();
-			$("#ApplicationTime").draggable();
+			$("#sortable").sortable();
+			$("#sortable").disableSelection();
 		});
 	</script>
 
@@ -66,17 +67,26 @@
 <body>
 
 <div class="demo">
-<p>Date: <input type="text" id="datepicker" size="30"/></p>
 
-<div id="CategoryTime" class="ui-widget-content">
-<H2>&nbsp Category Time</H2>
-<div id ="Category Time Chart"></div>
-</div>
-
-<div id="ApplicationTime" class="ui-widget-content">
-<H2>&nbsp Application Time</H2>
-<div id ="Application Time Chart"></div>
-</div>
+<ul id="sortable">
+	<li class="ui-state-default">
+		<p>Date:
+			<input type="text" id="datepicker" size="30"/>
+		</p>
+	</li>
+	<li class="ui-state-default">
+		<div>
+			<H2>&nbsp Category Time</H2>
+			<div id ="Category Time Chart"></div>
+		</div>
+	</li>
+	<li class="ui-state-default">
+		<div>
+			<H2>&nbsp Application Time</H2>
+			<div id ="Application Time Chart"></div>
+		</div>
+	</li>
+</ul>
 
 
 </div><!-- End demo -->
