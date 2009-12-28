@@ -5,6 +5,7 @@
 """
 __author__ = 'Xu, Yuan'
 
+from day import mergeAppDataList, mergeCateoryList
 from month import Month
 
 class Year():
@@ -13,6 +14,6 @@ class Year():
         self.categoryList = []
         for i in range(1, 12):
             result = Month(year, i)
-            self.applicationList += result.applicationList
-            self.categoryList += result.categoryList
+            self.applicationList = mergeAppDataList(self.applicationList, result.applicationList)
+            self.categoryList = mergeCateoryList(self.categoryList, result.categoryList)
         self.info = "%(year)d" % vars()

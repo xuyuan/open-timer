@@ -6,7 +6,7 @@
 __author__ = 'Xu, Yuan'
 
 import calendar
-from day import Day
+from day import Day, mergeAppDataList, mergeCateoryList
 
 class Month():
     def __init__(self, year, month):
@@ -15,7 +15,7 @@ class Month():
         r = calendar.monthrange(year, month)
         for i in range(r[0], r[1]):
             result = Day(year, month, i)
-            self.applicationList += result.applicationList
-            self.categoryList += result.categoryList
+            self.applicationList = mergeAppDataList(self.applicationList, result.applicationList)
+            self.categoryList = mergeCateoryList(self.categoryList, result.categoryList)
         self.info = "%(year)d-%(month)d" % vars()
 

@@ -92,3 +92,27 @@ class Pie():
 
 	def json(self):
 		return self.chart.create()
+
+class Bar():
+	def __init__(self, data):
+		bar = Chart()
+		bar.type = "bar_sketch"
+		bar.values = []
+		values = []
+		for v in data :
+			values.append(v.time())
+			bar.values.append({"top":v.time(), "tip":v.name+"<br>#val#"})
+		bar.on_show.type = "grow-up"
+
+		self.chart = Chart()
+		self.chart.y_axis.max = max(values)*1.1
+		self.chart.x_axis.labels.rotate = -45
+		self.chart.x_axis.labels.labels = []
+		for v in data :
+			self.chart.x_axis.labels.labels.append(v.name)
+		self.chart.bg_colour = '#FFFFFF'
+		
+		self.chart.elements = [bar]
+
+	def json(self):
+		return self.chart.create()

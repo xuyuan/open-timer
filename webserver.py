@@ -12,7 +12,7 @@ from day import Day
 from week import Week
 from month import Month
 from year import Year
-from OpenFlashChart import Chart, Pie
+from OpenFlashChart import Pie, Bar
 
 theData = None
 

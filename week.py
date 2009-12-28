@@ -6,7 +6,7 @@
 __author__ = 'Xu, Yuan'
 
 import datetime
-from day import Day
+from day import Day, mergeAppDataList, mergeCateoryList
 
 class Week():
     def __init__(self, year, month, day):
@@ -19,7 +19,7 @@ class Week():
         for i in range(0,6):
             theday = d + datetime.timedelta(days=i)
             result = Day(theday.year, theday.month, theday.day)
-            self.applicationList += result.applicationList
-            self.categoryList += result.applicationList
+            self.applicationList = mergeAppDataList(self.applicationList, result.applicationList)
+            self.categoryList = mergeCateoryList(self.categoryList, result.categoryList)
         self.info = d.isoformat() + " ~ " + (d+datetime.timedelta(days=7)).isoformat()
 

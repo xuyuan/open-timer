@@ -10,6 +10,70 @@ import time
 import sys
 import os
 
+appdict = {
+    # windows applications
+    'StartMenue':'^DV2ControlHost',
+    'WindowsFileSystem':'^CabinetWClass|^#32770 正在复制 \d* 个项目|^#32770 删除文件',
+    'Chrome':'^Chrome_',
+    'IE':'^IEFrame.*Windows Internet Explorer$',
+    'Notepad':'^Notepad',
+    'WindowsPhotoViewer':'^Photo_Lightweight_Viewer',
+    'TTPlayer':'^TTPlayer_|^#32770 千千静听',
+    'WindowsConsole':'^ConsoleWindowClass',
+    'TortoiseSVN':'.*TortoiseSVN$|.*- Commit - TortoiseSVN Finished!|^#32770 Commit -',
+    'FunshionPlayer':'^funshion_player_tzdenjohn',
+    'WindowsProgramManager':'^Progman Program Manager',
+    'WindowsMediaPlayer':'^WMPlayerApp Windows Media Player',
+    'DigitalPhotoProfessional':r'^ATL:0043D110 Digital Photo Professional|^#32770 Digital Photo Professional|^#32770 IMG_\d{4}\.CR2',
+    'StormPlayer':'^Afx:400000:3:10003:2:',
+    'MSN':'^IMWindowClass|.*Windows Live Messenger$',
+    # Linux applications
+    'GnomeTerminal':'^ "gnome-terminal"',
+    'Kpdf':'^ "kpdf"',
+    'evince':'^ "evince", "Evince"',
+    'Desktop':'^ "desktop_window"',
+    'Nautilus':'^ "nautilus"|^ "file_properties", "Nautilus"|^ "file_progress", "Nautilus"  "File Operations"',
+    'Gedit':'^ "gedit"',
+    'GnomeSetting':'^ "gnome-control-center"|^ "gnome-appearance-properties"',
+    'Totem':' "totem", "Totem"',
+    'Yast':'^ "y2controlcenter-gnome"|^ "y2base"',
+    'FileRoller':'^ "file-roller", "File-roller"',
+    'Synaptic':'^ "synaptic", "Synaptic"',
+    # Linux & Windows
+    'AdobeReader':'.*Adobe Reader$|^ "acroread", "Acroread"',
+    'Amule':'^ "amule", "Amule"',
+    'GIMP':'.*GIMP\r$|^gdkWindowToplevel|^ "gimp-\d\.\d", "Gimp-\d\.\d"',
+    'Firefox':'^ "Navigator", "Firefox"|^ "Dialog", "Firefox"|^ "Navigator", "Shiretoko"|^ "Dialog", "Shiretoko"|^ "Download", "Firefox"|^ "firefox", "Firefox"',
+    'Git':'^ "git-gui", "Git-gui"|^ "gitk", "Gitk"',
+    'JabRef':'^ "sun-awt-X11-XFramePeer", "net-sf-jabref-JabRefMain"  "JabRef"',
+    'NetBeans':'.*NetBeans IDE \d\.\d"',
+    'NaoTHRobotControl':'.*RobotControl for Nao',
+    'Emacs':'^Emacs|^ "emacs"',
+    'QQ':'^TXGuiFoundation|^ "qq"',
+    'OpenOffice':'^ "VCLSalFrame", "OpenOffice.org \d\.\d"|.*OpenOffice.org Calc$',
+    'SimSpark':'^ "simspark", "simspark"',
+    'Skype':'^ "skype"',
+    'Pidgin':'^ "pidgin"',
+    'Python':'^TkTopLevel|^Shell_TrayWnd|^ "python"',
+    'Picasa':'^ytWindow',
+    'Webots':'^ "webots", "Webots"'
+    }
+
+categoryDict = {
+    'InternetBrowser':'Firefox|Chrome|IE',
+    'Downloader':'Amule',
+    'Editor':'Emacs|Notepad|Gedit',
+    'PdfReader':'Kpdf|AdobeReader|evince',
+    'Console':'WindowsConsole|GnomeTerminal',
+    'Messanger':'QQ|Pidgin|Skype|MSN',
+    'Video/Music':'StormPlayer|TTPlayer|WindowsMediaPlayer|Totem',
+    'SystemUtilities':'WindowsFileSystem|Nautilus|GnomeSetting|Yast|WindowsProgramManager|StartMenue|FileRoller|Synaptic',
+    'Office':'OpenOffice|JabRef',
+    'Photography':'DigitalPhotoProfessional|WindowsPhotoViewer|GIMP|Picasa',
+    'DevTools':'TortoiseSVN|Python|NetBeans|NaoTHRobotControl|Git',
+    'Simulation':'Webots|SimSpark'
+    }
+
 class Application():
     def __init__(self, n, s):
         self.name = n
@@ -45,7 +109,33 @@ def removeZeroTime(l):
         if e.time() > 0 :
             r.append(e)
     return r
-    
+
+def mergeAppDataList(la, lb):
+    l = la
+    for v in lb:
+        merge = False
+        for vb in l:
+            if v.name == vb.name:
+                vb.addTime(v.time())
+                merge = True
+                break
+        if merge is False:
+            l.append(v)
+    return l
+
+def mergeCateoryList(la, lb):
+    l = la
+    for v in lb:
+        merge = False
+        for vb in l:
+            if v.name == vb.name:
+                vb.add(v)
+                merge = True
+                break
+        if merge is False:
+            l.append(v)
+    return l
+
 class Category():
     """
     Application category according to its function
@@ -55,7 +145,15 @@ class Category():
         self.p = re.compile(s)
         self.apps = []
 
+    def add(self, other):
+        self.apps = mergeAppDataList(self.apps, other.apps)
+
     def match(self,app):
+        for a in self.apps:
+            if a.name == app.name:
+                a.addTime(app.time())
+                return True
+
         if self.p.match(app.name):
             self.apps.append(app)
             return True
@@ -78,49 +176,14 @@ class Day():
             self.filename = time.strftime('%Y/%m/%d.txt', time.localtime())
         else:
             self.info = '%(year)d-%(month)d-%(day)d' % vars()
-            self.filename = '%(year)d/%(month)d/%(day)d.txt' % vars()
+            if day > 10:
+                self.filename = '%(year)d/%(month)d/%(day)d.txt' % vars()
+            else:
+                self.filename = '%(year)d/%(month)d/0%(day)d.txt' % vars()
         self.filename = os.path.dirname( os.path.realpath( __file__))+'/data/'+self.filename
         self.update()
 
     def updateApp(self,printunkown=False,checkcollision=False):
-        appdict = {
-            # windows applications
-            'StartMenue':'^DV2ControlHost',
-            'WindowsFileSystem':'^CabinetWClass|^#32770 正在复制 \d* 个项目|^#32770 删除文件',
-            'Chrome':'^Chrome_',
-            'IE':'^IEFrame.*Windows Internet Explorer$',
-            'Notepad':'^Notepad',
-            'WindowsPhotoViewer':'^Photo_Lightweight_Viewer',
-            'TTPlayer':'^TTPlayer_|^#32770 千千静听',
-            'WindowsConsole':'^ConsoleWindowClass',
-            'TortoiseSVN':'.*TortoiseSVN$|.*- Commit - TortoiseSVN Finished!|^#32770 Commit -',
-            'GIMP':'.*GIMP\r$|^gdkWindowToplevel',
-            'AdobeReader':'.*Adobe Reader$',
-            'FunshionPlayer':'^funshion_player_tzdenjohn',
-            'WindowsProgramManager':'^Progman Program Manager',
-            'WindowsMediaPlayer':'^WMPlayerApp Windows Media Player',
-            'OpenOffice':'.*OpenOffice.org Calc$',
-            'DigitalPhotoProfessional':r'^ATL:0043D110 Digital Photo Professional|^#32770 Digital Photo Professional|^#32770 IMG_\d{4}\.CR2',
-            'StormPlayer':'^Afx:400000:3:10003:2:',
-            'MSN':'^IMWindowClass|.*Windows Live Messenger$',
-            # Linux applications
-            'Firefox':'^ "Navigator", "Firefox"|^ "Dialog", "Firefox"',
-            'GnomeTerminal':'^ "gnome-terminal"',
-            'Kpdf':'^ "kpdf"',
-            'Desktop':'^ "desktop_window"',
-            'Nautilus':'^ "nautilus"|^ "file_properties", "Nautilus"',
-            'Gedit':'^ "gedit"',
-            'GnomeSetting':'^ "gnome-control-center"|^ "gnome-appearance-properties"',
-            'Yast':'^ "y2controlcenter-gnome"|^ "y2base"',
-            # Linux & Windows
-            'Emacs':'^Emacs|^ "emacs"',
-            'QQ':'^TXGuiFoundation|^ "qq"',
-            'OpenOffice':'^ "VCLSalFrame", "OpenOffice.org 3.0"',
-            'Skype':'^ "skype"',
-            'Pidgin':'^ "pidgin"',
-            'Python':'^TkTopLevel|^Shell_TrayWnd|^ "python"',
-            'Picasa':'^ytWindow'
-            }
     
         pstart = Application('start','^start')
         pstop = Application('stop','^stop')
@@ -170,6 +233,7 @@ class Day():
                             print line.decode('utf-8'),
                         other.match(title)
                         pmatched = other
+                        print title
                         
                     laststs = sts
                     lastmatched = pmatched
@@ -193,18 +257,6 @@ class Day():
         return applist
     
     def updateCategory(self, applist):
-        categoryDict = {
-            'InternetBrowser':'Firefox|Chrome|IE',
-            'Editor':'Emacs|Notepad|Gedit',
-            'PdfReader':'Kpdf|AdobeReader',
-            'Console':'WindowsConsole|GnomeTerminal',
-            'Messanger':'QQ|Pidgin|Skype|MSN',
-            'Video/Music':'StormPlayer|TTPlayer|WindowsMediaPlayer',
-            'SystemUtilities':'WindowsFileSystem|Nautilus|GnomeSetting|Yast|WindowsProgramManager|StartMenue',
-            'Office':'OpenOffice',
-            'Photography':'DigitalPhotoProfessional|WindowsPhotoViewer|GIMP|Picasa',
-            'DevTools':'TortoiseSVN|Python'
-            }
     
         categoryList = createListFromDict(Category,categoryDict)
         other = Category('Uncategorized','.')
@@ -217,9 +269,9 @@ class Day():
             if not ismatched:
                 other.match(app)
     
-        #print other.name, ':'
-        #for o in other.apps:
-        #    print o.name, o.time()
+        # print other.name, ':'
+        # for o in other.apps:
+           # print o.name, o.time()
         
         categoryList = removeZeroTime(categoryList)
         categoryList.sort()
