@@ -8,11 +8,13 @@ __author__ = 'Xu, Yuan'
 import string,cgi,time
 from os import curdir, sep, path
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
-import imp
 from day import Day
+from week import Week
+from month import Month
+from year import Year
 from OpenFlashChart import Chart, Pie
 
-theDay = None
+theData = None
 
 class PytimerHandler(BaseHTTPRequestHandler):
 
@@ -58,7 +60,7 @@ class PytimerHandler(BaseHTTPRequestHandler):
         self.executeCommand()
 
     def executeCommand(self):
-        global theDay
+        global theData
         self.send_response(200)
         self.send_header('Content-type', 'text/html')
         self.end_headers()
@@ -72,14 +74,30 @@ class PytimerHandler(BaseHTTPRequestHandler):
             self.wfile.write("exec "+cmd)
 
     def setDay(self, yy, mm, dd):
-        global theDay
-        theDay = Day(yy,mm,dd)
+        global theData
+        theData = Day(yy,mm,dd)
+        return theData.info
 
-    def getDay(self):
-        global theDay
-        if theDay is None :
-            theDay = Day()
-        return theDay
+    def setWeek(self, yy, mm, dd):
+        global theData
+        theData = Week(yy,mm,dd)
+        return theData.info
+
+    def setMonth(self, yy, mm, dd):
+        global theData
+        theData = Month(yy,mm)
+        return theData.info
+
+    def setYear(self, yy, mm, dd):
+        global theData
+        theData = Year(yy)
+        return theData.info
+
+    def getData(self):
+        global theData
+        if theData is None :
+            theData = Day()
+        return theData
 
 def main():
     try:

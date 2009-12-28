@@ -74,9 +74,12 @@ class Category():
 class Day():
     def __init__(self, year=0, month=0, day=0):
         if day == 0:
-            self.filename = time.strftime(os.path.dirname( os.path.realpath( __file__))+'/data/%Y/%m/%d.txt', time.localtime())
+            self.info = time.strftime('%Y-%m-%d', time.localtime())
+            self.filename = time.strftime('%Y/%m/%d.txt', time.localtime())
         else:
-            self.filename = os.path.dirname( os.path.realpath( __file__))+'/data/%(year)d/%(month)d/%(day)d.txt' % vars()
+            self.info = '%(year)d-%(month)d-%(day)d' % vars()
+            self.filename = '%(year)d/%(month)d/%(day)d.txt' % vars()
+        self.filename = os.path.dirname( os.path.realpath( __file__))+'/data/'+self.filename
         self.update()
 
     def updateApp(self,printunkown=False,checkcollision=False):
@@ -175,7 +178,7 @@ class Day():
                 line = f.readline()
         
         except IOError:
-            pass
+            self.info += ' data is empty'
 
         applist = removeZeroTime(applist)
         if other.time() > 0 :
