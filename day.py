@@ -27,6 +27,7 @@ appdict = {
     'DigitalPhotoProfessional':r'^ATL:0043D110 Digital Photo Professional|^#32770 Digital Photo Professional|^#32770 IMG_\d{4}\.CR2',
     'StormPlayer':'^Afx:400000:3:10003:2:',
     'MSN':'^IMWindowClass|.*Windows Live Messenger$',
+    'PES':'.*Pro Evolution Soccer 2009',
     # Linux applications
     'GnomeTerminal':'^ "gnome-terminal"',
     'Kpdf':'^ "kpdf"',
@@ -35,6 +36,7 @@ appdict = {
     'Nautilus':'^ "nautilus"|^ "file_properties", "Nautilus"|^ "file_progress", "Nautilus"  "File Operations"',
     'Gedit':'^ "gedit"',
     'GnomeSetting':'^ "gnome-control-center"|^ "gnome-appearance-properties"',
+    'Meld':'^ "meld", "Meld"',
     'Totem':' "totem", "Totem"',
     'Yast':'^ "y2controlcenter-gnome"|^ "y2base"',
     'FileRoller':'^ "file-roller", "File-roller"',
@@ -43,7 +45,7 @@ appdict = {
     'AdobeReader':'.*Adobe Reader$|^ "acroread", "Acroread"',
     'Amule':'^ "amule", "Amule"',
     'GIMP':'.*GIMP\r$|^gdkWindowToplevel|^ "gimp-\d\.\d", "Gimp-\d\.\d"',
-    'Firefox':'^ "Navigator", "Firefox"|^ "Dialog", "Firefox"|^ "Navigator", "Shiretoko"|^ "Dialog", "Shiretoko"|^ "Download", "Firefox"|^ "firefox", "Firefox"',
+    'Firefox':'^ "Navigator", "Firefox"|^ "Dialog", "Firefox"|^ "Navigator", "Shiretoko"|^ "Dialog", "Shiretoko"|^ "Download", "Firefox"|^ "firefox", "Firefox"|.* - Mozilla Firefox|MozillaUIWindowClass Mozilla Firefox',
     'Git':'^ "git-gui", "Git-gui"|^ "gitk", "Gitk"',
     'JabRef':'^ "sun-awt-X11-XFramePeer", "net-sf-jabref-JabRefMain"  "JabRef"',
     'NetBeans':'.*NetBeans IDE \d\.\d"',
@@ -51,7 +53,7 @@ appdict = {
     'Emacs':'^Emacs|^ "emacs"',
     'QQ':'^TXGuiFoundation|^ "qq"',
     'OpenOffice':'^ "VCLSalFrame", "OpenOffice.org \d\.\d"|.*OpenOffice.org Calc$',
-    'SimSpark':'^ "simspark", "simspark"',
+    'SimSpark':'^ "simspark", "simspark"|^ "rcssmonitor3d", "rcssmonitor3d"  "SimSpark"',
     'Skype':'^ "skype"',
     'Pidgin':'^ "pidgin"',
     'Python':'^TkTopLevel|^Shell_TrayWnd|^ "python"',
@@ -70,8 +72,9 @@ categoryDict = {
     'SystemUtilities':'WindowsFileSystem|Nautilus|GnomeSetting|Yast|WindowsProgramManager|StartMenue|FileRoller|Synaptic',
     'Office':'OpenOffice|JabRef',
     'Photography':'DigitalPhotoProfessional|WindowsPhotoViewer|GIMP|Picasa',
-    'DevTools':'TortoiseSVN|Python|NetBeans|NaoTHRobotControl|Git',
-    'Simulation':'Webots|SimSpark'
+    'DevTools':'TortoiseSVN|Python|NetBeans|NaoTHRobotControl|Git|Meld',
+    'Simulation':'Webots|SimSpark',
+    'Game':'PES'
     }
 
 class Application():
