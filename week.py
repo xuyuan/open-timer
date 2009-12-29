@@ -21,5 +21,7 @@ class Week():
             result = Day(theday.year, theday.month, theday.day)
             self.applicationList = mergeAppDataList(self.applicationList, result.applicationList)
             self.categoryList = mergeCateoryList(self.categoryList, result.categoryList)
+        self.applicationList.sort()
+        self.categoryList.sort()
         self.info = d.isoformat() + " ~ " + (d+datetime.timedelta(days=7)).isoformat()
 
