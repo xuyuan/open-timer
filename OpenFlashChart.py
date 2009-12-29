@@ -105,7 +105,8 @@ class Bar():
 		bar.on_show.type = "grow-up"
 
 		self.chart = Chart()
-		self.chart.y_axis.max = max(values)*1.1
+		if len(values) is not 0 :
+			self.chart.y_axis.max = max(values)*1.1
 		self.chart.x_axis.labels.rotate = -45
 		self.chart.x_axis.labels.labels = []
 		for v in data :

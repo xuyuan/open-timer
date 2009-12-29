@@ -36,6 +36,7 @@ appdict = {
     'Nautilus':'^ "nautilus"|^ "file_properties", "Nautilus"|^ "file_progress", "Nautilus"  "File Operations"',
     'Gedit':'^ "gedit"',
     'GnomeSetting':'^ "gnome-control-center"|^ "gnome-appearance-properties"',
+    'Mplayer':'^ "gnome-mplayer", "Gnome-mplayer"',
     'Meld':'^ "meld", "Meld"',
     'Totem':' "totem", "Totem"',
     'Yast':'^ "y2controlcenter-gnome"|^ "y2base"',
@@ -68,7 +69,7 @@ categoryDict = {
     'PdfReader':'Kpdf|AdobeReader|evince',
     'Console':'WindowsConsole|GnomeTerminal',
     'Messanger':'QQ|Pidgin|Skype|MSN',
-    'Video/Music':'StormPlayer|TTPlayer|WindowsMediaPlayer|Totem',
+    'Video/Music':'StormPlayer|TTPlayer|WindowsMediaPlayer|Totem|MPlayer',
     'SystemUtilities':'WindowsFileSystem|Nautilus|GnomeSetting|Yast|WindowsProgramManager|StartMenue|FileRoller|Synaptic',
     'Office':'OpenOffice|JabRef',
     'Photography':'DigitalPhotoProfessional|WindowsPhotoViewer|GIMP|Picasa',
@@ -114,30 +115,17 @@ def removeZeroTime(l):
     return r
 
 def mergeAppDataList(la, lb):
-    l = la
     for v in lb:
         merge = False
-        for vb in l:
-            if v.name == vb.name:
-                vb.addTime(v.time())
+        for va in la:
+            if v.name == va.name:
+                va.count += v.count
+                va.t += v.t
                 merge = True
                 break
         if merge is False:
-            l.append(v)
-    return l
-
-def mergeCateoryList(la, lb):
-    l = la
-    for v in lb:
-        merge = False
-        for vb in l:
-            if v.name == vb.name:
-                vb.add(v)
-                merge = True
-                break
-        if merge is False:
-            l.append(v)
-    return l
+            la.append(v)
+    return la
 
 class Category():
     """
@@ -147,9 +135,6 @@ class Category():
         self.name = n
         self.p = re.compile(s)
         self.apps = []
-
-    def add(self, other):
-        self.apps = mergeAppDataList(self.apps, other.apps)
 
     def match(self,app):
         for a in self.apps:
@@ -172,17 +157,38 @@ class Category():
     def __cmp__(self, other):
         return other.time() - self.time()
 
+def updateCategory(applist):
+    
+    categoryList = createListFromDict(Category,categoryDict)
+    other = Category('Uncategorized','.')
+    for app in applist:
+        ismatched = False
+        for c in categoryList:
+            if c.match(app):
+                ismatched = True
+                break
+        if not ismatched:
+            other.match(app)
+    
+        # print other.name, ':'
+        # for o in other.apps:
+           # print o.name, o.time()
+        
+    categoryList = removeZeroTime(categoryList)
+    categoryList.sort()
+    if other.time() > 0 :
+        categoryList.append(other)
+    
+    return categoryList
+
 class Day():
     def __init__(self, year=0, month=0, day=0):
         if day == 0:
             self.info = time.strftime('%Y-%m-%d', time.localtime())
             self.filename = time.strftime('%Y/%m/%d.txt', time.localtime())
         else:
-            self.info = '%(year)d-%(month)d-%(day)d' % vars()
-            if day > 10:
-                self.filename = '%(year)d/%(month)d/%(day)d.txt' % vars()
-            else:
-                self.filename = '%(year)d/%(month)d/0%(day)d.txt' % vars()
+            self.info = '%(year)d-%(month).2d-%(day).2d' % vars()
+            self.filename = '%(year)d/%(month).2d/%(day).2d.txt' % vars()
         self.filename = os.path.dirname( os.path.realpath( __file__))+'/data/'+self.filename
         self.update()
 
@@ -196,53 +202,56 @@ class Day():
     
         try:
             f = open(self.filename,'r')
-
             line = f.readline()
+            ln = 1
             laststs = None
             lastmatched = pstart
             while len(line) > 0:
                 pmatched = None
             #print line,
                 st = laststs
-                if pstart.match(line):
-                    st = time.strptime(line[6:14],"%H:%M:%S")
-                    pmatched = pstart
-                    laststs = st.tm_hour*3600+st.tm_min*60+st.tm_sec
-                elif pstop.match(line):
-                    st = time.strptime(line[5:13],"%H:%M:%S")
-                    pmatched = pstop
-                    sts = st.tm_hour*3600+st.tm_min*60+st.tm_sec
-                    dt = sts - laststs
-                    lastmatched.addTime(dt)
-                    laststs = sts
-                else:
-                    ismatched = False
-                    title = line[9:]
-                    st = time.strptime(line[:8],"%H:%M:%S")
-                    sts = st.tm_hour*3600+st.tm_min*60+st.tm_sec
-                    dt = sts - laststs
-                    lastmatched.addTime(dt)
-                    for a in applist:
-                        if a.match(title):
-                            if checkcollision and ismatched:
-                                print 'App collision!!!', pmatched.name, ' : ' ,a.name
-                                print line
-                            pmatched = a
-                            ismatched = True
-                            if not checkcollision:
-                                break
-                    if not ismatched:
-                        if printunkown:
-                            print line.decode('utf-8'),
-                        other.match(title)
-                        pmatched = other
-                        print title
+                try:
+                    if pstart.match(line):
+                        st = time.strptime(line[6:14],"%H:%M:%S")
+                        pmatched = pstart
+                        laststs = st.tm_hour*3600+st.tm_min*60+st.tm_sec
+                    elif pstop.match(line):
+                        st = time.strptime(line[5:13],"%H:%M:%S")
+                        pmatched = pstop
+                        sts = st.tm_hour*3600+st.tm_min*60+st.tm_sec
+                        dt = sts - laststs
+                        lastmatched.addTime(dt)
+                        laststs = sts
+                    else:
+                        ismatched = False
+                        title = line[9:]
+                        st = time.strptime(line[:8],"%H:%M:%S")
+                        sts = st.tm_hour*3600+st.tm_min*60+st.tm_sec
+                        dt = sts - laststs
+                        lastmatched.addTime(dt)
+                        for a in applist:
+                            if a.match(title):
+                                if checkcollision and ismatched:
+                                    print 'App collision!!!', pmatched.name, ' : ' ,a.name
+                                    print line
+                                pmatched = a
+                                ismatched = True
+                                if not checkcollision:
+                                    break
+                        if not ismatched:
+                            if printunkown:
+                                print line.decode('utf-8'),
+                            other.match(title)
+                            pmatched = other
                         
-                    laststs = sts
-                    lastmatched = pmatched
-                
+                        laststs = sts
+                        lastmatched = pmatched
+                except ValueError:
+                        print 'ValueError @ '+self.filename+' %d' % ln
+                        print "'"+line+"'"
                     
                 line = f.readline()
+                ln = ln + 1
         
         except IOError:
             self.info += ' data is empty'
@@ -259,31 +268,7 @@ class Day():
         
         return applist
     
-    def updateCategory(self, applist):
-    
-        categoryList = createListFromDict(Category,categoryDict)
-        other = Category('Uncategorized','.')
-        for app in applist:
-            ismatched = False
-            for c in categoryList:
-                if c.match(app):
-                    ismatched = True
-                    break
-            if not ismatched:
-                other.match(app)
-    
-        # print other.name, ':'
-        # for o in other.apps:
-           # print o.name, o.time()
-        
-        categoryList = removeZeroTime(categoryList)
-        categoryList.sort()
-        if other.time() > 0 :
-            categoryList.append(other)
-    
-        return categoryList
-    
     def update(self):
         self.applicationList = self.updateApp()
-        self.categoryList = self.updateCategory(self.applicationList)
+        self.categoryList = updateCategory(self.applicationList)
 
