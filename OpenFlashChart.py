@@ -81,7 +81,7 @@ class Pie():
 	def __init__(self, data):
 		pie = Chart()
 		pie.type = "pie"
-		pie.tip = "#val# of #total#<br>#percent# of 100%"
+		pie.tip = "#percent#<br>#val# of #total#"
 		pie.colours = ["ff3333", "#33ff66", "#0066cc"]
 		pie.values = []
 		for v in data :

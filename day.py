@@ -15,7 +15,7 @@ appdict = {
     'StartMenue':'^DV2ControlHost',
     'WindowsFileSystem':'^CabinetWClass|^#32770 正在复制 \d* 个项目|^#32770 删除文件',
     'Chrome':'^Chrome_',
-    'IE':'^IEFrame.*Windows Internet Explorer$',
+    'IE':'^IEFrame|^#32770 Windows Internet Explorer',
     'Notepad':'^Notepad',
     'WindowsPhotoViewer':'^Photo_Lightweight_Viewer',
     'TTPlayer':'^TTPlayer_|^#32770 千千静听',
@@ -24,11 +24,16 @@ appdict = {
     'FunshionPlayer':'^funshion_player_tzdenjohn',
     'WindowsProgramManager':'^Progman Program Manager',
     'WindowsMediaPlayer':'^WMPlayerApp Windows Media Player',
-    'DigitalPhotoProfessional':r'^ATL:0043D110 Digital Photo Professional|^#32770 Digital Photo Professional|^#32770 IMG_\d{4}\.CR2',
+    'DigitalPhotoProfessional':r'^ATL:0043D110 Digital Photo Professional|^#32770 Digital Photo Professional|^#32770 IMG_\d{4}\.CR2|^ATL:0043C3C0',
     'StormPlayer':'^Afx:400000:3:10003:2:',
-    'MSN':'^IMWindowClass|.*Windows Live Messenger$',
+    'MSN':'^IMWindowClass|.*Windows Live Messenger$|^MSBLWindowClass Windows Live Messenger',
     'PES':'.*Pro Evolution Soccer 2009',
+    'QuickTime':'^QuickTimePlayerMain',
+    'WinRAR':'^WinRarWindow',
     # Linux applications
+    'BackInTime':'.*"Back In Time"',
+    'Banshee':'^ "Nereid", "banshee-1"',
+    'EyeOfGNOME':'^ "eog", "Eog"',
     'GnomeTerminal':'^ "gnome-terminal"',
     'Kpdf':'^ "kpdf"',
     'evince':'^ "evince", "Evince"',
@@ -36,9 +41,13 @@ appdict = {
     'Nautilus':'^ "nautilus"|^ "file_properties", "Nautilus"|^ "file_progress", "Nautilus"  "File Operations"',
     'Gedit':'^ "gedit"',
     'GnomeSetting':'^ "gnome-control-center"|^ "gnome-appearance-properties"',
-    'Mplayer':'^ "gnome-mplayer", "Gnome-mplayer"',
+    'Inkscape':'^ "inkscape", "Inkscape"',
+    'Mplayer':'^ "gnome-mplayer", "Gnome-mplayer"|^ "MPlayer", "MPlayer"|^ "Message", "MPlayer"',
     'Meld':'^ "meld", "Meld"',
-    'Totem':' "totem", "Totem"',
+    'RDesktop':'^ "rdesktop", "rdesktop"',
+    'Rhythmbox':'^ "rhythmbox", "Rhythmbox"',
+    'Totem':'^ "totem", "Totem"',
+    'Transmission':'^ "transmission", "Transmission"',
     'Yast':'^ "y2controlcenter-gnome"|^ "y2base"',
     'FileRoller':'^ "file-roller", "File-roller"',
     'Synaptic':'^ "synaptic", "Synaptic"',
@@ -47,33 +56,37 @@ appdict = {
     'Amule':'^ "amule", "Amule"',
     'GIMP':'.*GIMP\r$|^gdkWindowToplevel|^ "gimp-\d\.\d", "Gimp-\d\.\d"',
     'Firefox':'^ "Navigator", "Firefox"|^ "Dialog", "Firefox"|^ "Navigator", "Shiretoko"|^ "Dialog", "Shiretoko"|^ "Download", "Firefox"|^ "firefox", "Firefox"|.* - Mozilla Firefox|MozillaUIWindowClass Mozilla Firefox',
-    'Git':'^ "git-gui", "Git-gui"|^ "gitk", "Gitk"',
+    'Git':'^ "git-gui", "Git-gui"|^ "gitk", "Gitk"|^ "git-cola", "Git-cola"',
+    'GoogleEarth':'^ "googleearth-bin", "Googleearth-bin"',
     'JabRef':'^ "sun-awt-X11-XFramePeer", "net-sf-jabref-JabRefMain"  "JabRef"',
+    'Matlab':'.*"MATLAB  7.6.0 (R2008a)"|^ "sun-awt-X11-XFramePeer", "com-mathworks-util-PostVMInit"',
     'NetBeans':'.*NetBeans IDE \d\.\d"',
-    'NaoTHRobotControl':'.*RobotControl for Nao',
-    'Emacs':'^Emacs|^ "emacs"',
+    'NaoTHRobotControl':'.*RobotControl for Nao|^ "sun-awt-X11-XDialogPeer", "de-hu_berlin-informatik-ki-nao-Main"',
+    'XABSLEditor':'^ "sun-awt-X11-XFramePeer", "de-hu_berlin-informatik-ki-jxabsleditor-Main"',
+    'Emacs':'^Emacs|^ "emacs"|^ "emacs-snapshot"',
     'QQ':'^TXGuiFoundation|^ "qq"',
     'OpenOffice':'^ "VCLSalFrame", "OpenOffice.org \d\.\d"|.*OpenOffice.org Calc$',
-    'SimSpark':'^ "simspark", "simspark"|^ "rcssmonitor3d", "rcssmonitor3d"  "SimSpark"',
-    'Skype':'^ "skype"',
+    'SimSpark':'^ "simspark", "simspark"|^ "rcssmonitor3d", "rcssmonitor3d"  "SimSpark"|^ "rsgedit", "Rsgedit"',
+    'Skype':'^ "skype"|^ tSkMainForm.UnicodeClass Skype',
     'Pidgin':'^ "pidgin"',
     'Python':'^TkTopLevel|^Shell_TrayWnd|^ "python"',
-    'Picasa':'^ytWindow',
+    'Picasa':'^ytWindow|^ "Picasa3.exe", "Wine"',
     'Webots':'^ "webots", "Webots"'
     }
 
 categoryDict = {
     'InternetBrowser':'Firefox|Chrome|IE',
-    'Downloader':'Amule',
+    'Downloader':'Amule|Transmission',
     'Editor':'Emacs|Notepad|Gedit',
     'PdfReader':'Kpdf|AdobeReader|evince',
     'Console':'WindowsConsole|GnomeTerminal',
     'Messanger':'QQ|Pidgin|Skype|MSN',
-    'Video/Music':'StormPlayer|TTPlayer|WindowsMediaPlayer|Totem|MPlayer',
-    'SystemUtilities':'WindowsFileSystem|Nautilus|GnomeSetting|Yast|WindowsProgramManager|StartMenue|FileRoller|Synaptic',
+    'Video':'WindowsMediaPlayer|Totem|MPlayer|QuickTime',
+    'Music':'StormPlayer|TTPlayer|Banshee|Rhythmbox',
+    'SystemUtilities':'WindowsFileSystem|Nautilus|GnomeSetting|Yast|WindowsProgramManager|StartMenue|FileRoller|Synaptic|WinRAR|Rdesktop',
     'Office':'OpenOffice|JabRef',
-    'Photography':'DigitalPhotoProfessional|WindowsPhotoViewer|GIMP|Picasa',
-    'DevTools':'TortoiseSVN|Python|NetBeans|NaoTHRobotControl|Git|Meld',
+    'Photography':'DigitalPhotoProfessional|WindowsPhotoViewer|GIMP|Picasa|EyeOfGNOME|Inkscape',
+    'DevTools':'TortoiseSVN|Python|NetBeans|NaoTHRobotControl|Git|Meld|Matlab|XABSLEditor',
     'Simulation':'Webots|SimSpark',
     'Game':'PES'
     }
@@ -192,7 +205,7 @@ class Day():
         self.filename = os.path.dirname( os.path.realpath( __file__))+'/data/'+self.filename
         self.update()
 
-    def updateApp(self,printunkown=False,checkcollision=False):
+    def updateApp(self,printunkown=True,checkcollision=False):
     
         pstart = Application('start','^start')
         pstop = Application('stop','^stop')

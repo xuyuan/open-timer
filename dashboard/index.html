@@ -10,6 +10,7 @@
 	<script type="text/javascript" src="js/ui/ui.datepicker.js"></script>
 	<script type="text/javascript" src="js/ui/ui.selectable.js"></script>
 	<script type="text/javascript" src="js/ui/ui.sortable.js"></script>
+	<script type="text/javascript" src="js/ui/ui.resizable.js"></script>
 	<link type="text/css" href="demos.css" rel="stylesheet" />
 	<script type="text/javascript">
 
@@ -75,6 +76,9 @@
 				});
 
 			$("#sortable").sortable();
+			$('#sortable').children('li').each(function(){
+					$(this).resizable();
+					});
 			$("#sortable").disableSelection();
 
 			$("#periodSelector").selectable({
@@ -102,13 +106,13 @@
 
 	<script type="text/javascript">
 		swfobject.embedSWF(
-  		"open-flash-chart.swf", "Category Time Chart", "400", "300",
+  		"open-flash-chart.swf", "Category Time Chart", "100%", "100%",
   		"9.0.0", "expressInstall.swf",
   		{"data-file":"/"+CategoryTimeSetting+"(self.getData().categoryList).json()"}
   		);
 
 		swfobject.embedSWF(
-  		"open-flash-chart.swf", "Application Time Chart", "400", "300",
+  		"open-flash-chart.swf", "Application Time Chart", "100%", "100%",
   		"9.0.0", "expressInstall.swf",
   		{"data-file":"/"+ApplicationTimeSetting+"(self.getData().applicationList).json()"}
   		);
@@ -129,6 +133,7 @@
 
 	<ul id="sortable">
 		<li class="ui-state-default">
+			<div class="ui-sortable-box">
 				<div id="datepicker"/></div>
 				<ul id="periodSelector">
 					<li class="ui-widget-content">Day</li>
@@ -136,29 +141,30 @@
 					<li class="ui-widget-content">Month</li>
 					<li class="ui-widget-content">Year</li>
 				</ul>
-		</li>
-		<li class="ui-state-default">
-			<div>
-				<H2>&nbsp Category Time	</H2>
-				<div id ="Category Time Chart"></div>
-				<div id="CategoryTimeSetting">Setting
-					<ul>
-						<li>Pie</li>
-						<li>Bar</li>
-					</ul>
-				</div>
 			</div>
 		</li>
 		<li class="ui-state-default">
-			<div>
-				<H2>&nbsp Application Time</H2>
+			<H2>&nbsp Category Time	</H2>
+			<div class="ui-sortable-box">
+				<div id ="Category Time Chart"></div>
+			</div>
+			<div id="CategoryTimeSetting">Setting
+				<ul>
+					<li>Pie</li>
+					<li>Bar</li>
+				</ul>
+			</div>
+		</li>
+		<li class="ui-state-default">
+			<H2>&nbsp Application Time</H2>
+			<div class="ui-sortable-box">
 				<div id ="Application Time Chart"></div>
-				<div id="ApplicationTimeSetting">Setting
-					<ul>
-						<li>Pie</li>
-						<li>Bar</li>
-					</ul>
-				</div>
+			</div>
+			<div id="ApplicationTimeSetting">Setting
+				<ul>
+					<li>Pie</li>
+					<li>Bar</li>
+				</ul>
 			</div>
 		</li>
 	</ul>
