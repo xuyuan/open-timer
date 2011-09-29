@@ -7,7 +7,6 @@ __author__ = 'Xu, Yuan'
 
 import re
 import time
-import sys
 import os
 
 appdict = {
@@ -32,7 +31,7 @@ appdict = {
     'WinRAR':'^WinRarWindow',
     # Linux applications
     'BackInTime':'.*"Back In Time"',
-    'Banshee':'^ "Nereid", "banshee-1"',
+    'Banshee':'^ "Nereid", "banshee-1"|^ "Banshee", "banshee"',
     'EyeOfGNOME':'^ "eog", "Eog"',
     'GnomeTerminal':'^ "gnome-terminal"',
     'Kpdf':'^ "kpdf"',
@@ -51,42 +50,51 @@ appdict = {
     'Yast':'^ "y2controlcenter-gnome"|^ "y2base"',
     'FileRoller':'^ "file-roller", "File-roller"',
     'Synaptic':'^ "synaptic", "Synaptic"',
+    'Guake': '^ "guake.py", "Guake.py"',
+    'REP': '^ "rep.py", "Rep.py"',
+    'Gnome-screenshot': '^ "gnome-screenshot", "Gnome-screenshot"',
+    'Gnome-system-monitor': '^ "gnome-system-monitor", "Gnome-system-monitor"  "System Monitor"',
     # Linux & Windows
     'AdobeReader':'.*Adobe Reader$|^ "acroread", "Acroread"',
     'Amule':'^ "amule", "Amule"',
     'GIMP':'.*GIMP\r$|^gdkWindowToplevel|^ "gimp-\d\.\d", "Gimp-\d\.\d"',
-    'Firefox':'^ "Navigator", "Firefox"|^ "Dialog", "Firefox"|^ "Navigator", "Shiretoko"|^ "Dialog", "Shiretoko"|^ "Download", "Firefox"|^ "firefox", "Firefox"|.* - Mozilla Firefox|MozillaUIWindowClass Mozilla Firefox',
+    'Firefox':'^ ".*", "Firefox"|^ ".*", "Firefox-bin"|^ ".*", "Shiretoko"|.* - Mozilla Firefox|MozillaUIWindowClass Mozilla Firefox',
     'Git':'^ "git-gui", "Git-gui"|^ "gitk", "Gitk"|^ "git-cola", "Git-cola"',
     'GoogleEarth':'^ "googleearth-bin", "Googleearth-bin"',
-    'JabRef':'^ "sun-awt-X11-XFramePeer", "net-sf-jabref-JabRefMain"  "JabRef"',
+    'JabRef':'^ ".*", "net-sf-jabref-JabRefMain"  ".*"',
     'Matlab':'.*"MATLAB  7.6.0 (R2008a)"|^ "sun-awt-X11-XFramePeer", "com-mathworks-util-PostVMInit"',
     'NetBeans':'.*NetBeans IDE \d\.\d"',
     'NaoTHRobotControl':'.*RobotControl for Nao|^ "sun-awt-X11-XDialogPeer", "de-hu_berlin-informatik-ki-nao-Main"',
     'XABSLEditor':'^ "sun-awt-X11-XFramePeer", "de-hu_berlin-informatik-ki-jxabsleditor-Main"',
-    'Emacs':'^Emacs|^ "emacs"|^ "emacs-snapshot"',
+    'Emacs':'^Emacs|^ "emacs"|^ "emacs-snapshot"|^ ".*", "Emacs"',
     'QQ':'^TXGuiFoundation|^ "qq"',
     'OpenOffice':'^ "VCLSalFrame", "OpenOffice.org \d\.\d"|.*OpenOffice.org Calc$',
-    'SimSpark':'^ "simspark", "simspark"|^ "rcssmonitor3d", "rcssmonitor3d"  "SimSpark"|^ "rsgedit", "Rsgedit"',
+    'SimSpark':'^ "simspark", "simspark"|^ "rcssmonitor3d", "rcssmonitor3d"  "SimSpark"|^ "rsgedit", "Rsgedit"|^ "rcssserver3d", "rcssserver3d"',
     'Skype':'^ "skype"|^ tSkMainForm.UnicodeClass Skype',
     'Pidgin':'^ "pidgin"',
     'Python':'^TkTopLevel|^Shell_TrayWnd|^ "python"',
     'Picasa':'^ytWindow|^ "Picasa3.exe", "Wine"',
-    'Webots':'^ "webots", "Webots"'
+    'Webots':'^ "webots", "Webots"',
+    'Evolution': '^ "evolution", "Evolution"',
+    'Thunderbird': '^ ".*", "Thunderbird"',
+    'Qtcreator': '^ "qtcreator", "Qtcreator"',
+    'QtAssistant': '^ "assistant", "Assistant"'
     }
 
 categoryDict = {
-    'InternetBrowser':'Firefox|Chrome|IE',
-    'Downloader':'Amule|Transmission',
-    'Editor':'Emacs|Notepad|Gedit',
+    'InternetBrowser': 'Firefox|Chrome|IE',
+    'Email': 'Evolution|Thunderbird',
+    'Downloader': 'Amule|Transmission',
+    'Editor': 'Emacs|Notepad|Gedit',
     'PdfReader':'Kpdf|AdobeReader|evince',
-    'Console':'WindowsConsole|GnomeTerminal',
+    'Console':'WindowsConsole|GnomeTerminal|Guake',
     'Messanger':'QQ|Pidgin|Skype|MSN',
     'Video':'WindowsMediaPlayer|Totem|MPlayer|QuickTime',
     'Music':'StormPlayer|TTPlayer|Banshee|Rhythmbox',
-    'SystemUtilities':'WindowsFileSystem|Nautilus|GnomeSetting|Yast|WindowsProgramManager|StartMenue|FileRoller|Synaptic|WinRAR|Rdesktop',
+    'SystemUtilities':'WindowsFileSystem|Nautilus|GnomeSetting|Yast|WindowsProgramManager|StartMenue|FileRoller|Synaptic|WinRAR|Rdesktop|Gnome-screenshot|Gnome-system-monitor',
     'Office':'OpenOffice|JabRef',
     'Photography':'DigitalPhotoProfessional|WindowsPhotoViewer|GIMP|Picasa|EyeOfGNOME|Inkscape',
-    'DevTools':'TortoiseSVN|Python|NetBeans|NaoTHRobotControl|Git|Meld|Matlab|XABSLEditor',
+    'DevTools':'TortoiseSVN|Python|NetBeans|NaoTHRobotControl|Git|Meld|Matlab|XABSLEditor|REP|Qtcreator|QtAssistant',
     'Simulation':'Webots|SimSpark',
     'Game':'PES'
     }
