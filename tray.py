@@ -14,12 +14,13 @@ import wx
 from timecollector import TimeCollector
 import webbrowser
 
+
 class TimeSaverTaskBarIcon(wx.TaskBarIcon):
     def __init__(self, parent):
         wx.TaskBarIcon.__init__(self)
         self.parentApp = parent
         self.CreateMenu()
-    
+
     def CreateMenu(self):
         self.Bind(wx.EVT_TASKBAR_RIGHT_UP, self.ShowMenu)
 
@@ -32,23 +33,26 @@ class TimeSaverTaskBarIcon(wx.TaskBarIcon):
     def ShowMenu(self, event):
         self.PopupMenu(self.menu)
 
+
 class TimeSaver(wx.Frame):
     def __init__(self):
         title = 'TimeSaver'
         size = (500, 500)
         wx.Frame.__init__(self, parent=None, title=title, size=size)
 
-        self.icon = wx.Icon(os.path.dirname( os.path.realpath( __file__ ) )
-+'/logo.png',wx.BITMAP_TYPE_PNG)
+        self.icon = wx.Icon(os.path.join(os.path.dirname(__file__),
+                                'logo.png'),
+                            wx.BITMAP_TYPE_PNG)
         self.SetIcon(self.icon)
-        
+
         # then initial a panel
         panel = wx.Panel(parent=self)
         self.panel = panel
 
         # a multi-line text
-        self.text = wx.TextCtrl(panel,style=wx.TE_MULTILINE | wx.TE_RICH2 | wx.HSCROLL)
-        
+        self.text = wx.TextCtrl(panel,
+                        style=wx.TE_MULTILINE | wx.TE_RICH2 | wx.HSCROLL)
+
         # resize event
         self.Bind(wx.EVT_SIZE, self.OnSize)
         # minimize event
@@ -80,7 +84,6 @@ class TimeSaver(wx.Frame):
             if self.IsShown():
                 self.SetFocus()
 
-
     def OnMenuClose(self, event):
         self.OnClose(event)
         sys.exit()
@@ -97,7 +100,7 @@ class TimeSaver(wx.Frame):
         self.Show(False)
         event.Skip()
 
-    def OnSize(self, event):    
+    def OnSize(self, event):
         size = self.GetClientSize()
         self.text.SetSize(size)
         self.panel.SetSize(size)
@@ -109,14 +112,15 @@ class TimeSaver(wx.Frame):
     def start(self):
             self.timer.Start(2000)
 
-    def onTimer(self,event):
+    def onTimer(self, event):
         data = self.timecollector.collect()
         if self.IsShown():
             self.log(data)
 
-    def onDashboard(self,event):
+    def onDashboard(self, event):
         webbrowser.open('http://localhost::8080/dashboard/index.html')
         event.Skip()
+
 
 def main():
     app = wx.App(False)
