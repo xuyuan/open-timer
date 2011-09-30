@@ -8,6 +8,7 @@ __author__ = 'Xu, Yuan'
 import datetime
 from day import Day, mergeAppDataList, updateCategory
 
+
 class Week():
     def __init__(self, year, month, day):
         self.applicationList = []
@@ -16,12 +17,13 @@ class Week():
         if day is not 0:
             d = datetime.date(year, month, day)
         d = d + datetime.timedelta(days=-d.weekday())
-        for i in range(0,7):
+        for i in xrange(7):
             theday = d + datetime.timedelta(days=i)
             result = Day(theday.year, theday.month, theday.day)
-            self.applicationList = mergeAppDataList(self.applicationList, result.applicationList)
+            self.applicationList = mergeAppDataList(self.applicationList,
+                                                    result.applicationList)
         self.categoryList = updateCategory(self.applicationList)
         self.applicationList.sort()
         self.categoryList.sort()
-        self.info = d.isoformat() + " ~ " + (d+datetime.timedelta(days=7)).isoformat()
-
+        self.info = (d.isoformat() + " ~ " +
+                    (d + datetime.timedelta(days=7)).isoformat())
