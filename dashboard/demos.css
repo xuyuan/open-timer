@@ -335,7 +335,7 @@ div.demo-description {
 /** add by xy */
 #sortable { list-style-type: none; margin: 0; padding: 0; }
 #sortable li { margin: 3px 3px 3px 0; padding: 1px; float: left; }
-#sortable .ui-sortable-box { width: 400px; height: 300px; }
+#sortable .ui-sortable-box { width: 360px; height: 270px; }
 
 #periodSelector .ui-selecting { background: #FECA40; }
 #periodSelector .ui-selected { background: #F39814; color: white; }
