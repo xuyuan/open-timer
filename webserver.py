@@ -6,7 +6,7 @@ simple web server for dashboard
 __author__ = 'Xu, Yuan'
 
 import cgi
-from os import curdir, sep
+from os import path
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 from day import Day
 from week import Week
@@ -15,7 +15,7 @@ from year import Year
 from chart import Pie, Bar
 
 theData = None
-
+dirname = path.dirname(__file__)
 
 class PytimerHandler(BaseHTTPRequestHandler):
 
@@ -25,7 +25,7 @@ class PytimerHandler(BaseHTTPRequestHandler):
             if (filename.endswith(".html") or filename.endswith(".css")
                 or filename.endswith(".js") or filename.endswith(".swf")
                 or filename.endswith(".png")):
-                f = open(curdir + sep + filename)
+                f = open(path.join(dirname, filename[1:]))
                 self.send_response(200)
                 self.send_header('Content-type', 'text/'
                                 + filename[filename.rfind('.') + 1:])
