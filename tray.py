@@ -16,6 +16,7 @@ import webbrowser
 
 
 class TimeSaverTaskBarIcon(wx.TaskBarIcon):
+    """indicator"""
     def __init__(self, parent):
         wx.TaskBarIcon.__init__(self)
         self.parentApp = parent
@@ -34,7 +35,27 @@ class TimeSaverTaskBarIcon(wx.TaskBarIcon):
         self.PopupMenu(self.menu)
 
 
+class LogViewer(wx.Panel):
+    """panel displays logs"""
+    def __init__(self, parent):
+        wx.Panel.__init__(self, parent)
+
+        # a multi-line text
+        self.text = wx.TextCtrl(self,
+                        style=wx.TE_MULTILINE | wx.TE_RICH2 | wx.HSCROLL)
+
+    def log(self, string):
+        self.text.AppendText(string)
+
+    def OnSize(self, event):
+        size = self.GetClientSize()
+        self.text.SetSize(size)
+        self.SetSize(size)
+        event.Skip()
+
+
 class TimeSaver(wx.Frame):
+    """main frame"""
     def __init__(self):
         title = 'TimeSaver'
         size = (500, 500)
@@ -45,13 +66,8 @@ class TimeSaver(wx.Frame):
                             wx.BITMAP_TYPE_PNG)
         self.SetIcon(self.icon)
 
-        # then initial a panel
-        panel = wx.Panel(parent=self)
-        self.panel = panel
-
-        # a multi-line text
-        self.text = wx.TextCtrl(panel,
-                        style=wx.TE_MULTILINE | wx.TE_RICH2 | wx.HSCROLL)
+        # tabs
+        self.logViewer = LogViewer(self)
 
         # resize event
         self.Bind(wx.EVT_SIZE, self.OnSize)
@@ -76,8 +92,8 @@ class TimeSaver(wx.Frame):
 
         #####
         self.timecollector = TimeCollector()
-        self.timer = wx.Timer(panel)
-        wx.EVT_TIMER(panel, self.timer.GetId(), self.onTimer)
+        self.timer = wx.Timer(self)
+        wx.EVT_TIMER(self, self.timer.GetId(), self.onTimer)
 
     def OnResume(self, event):
             self.Show(not self.IsShown())
@@ -101,13 +117,8 @@ class TimeSaver(wx.Frame):
         event.Skip()
 
     def OnSize(self, event):
-        size = self.GetClientSize()
-        self.text.SetSize(size)
-        self.panel.SetSize(size)
+        self.logViewer.OnSize(event)
         event.Skip()
-
-    def log(self, string):
-        self.text.AppendText(string)
 
     def start(self):
             self.timer.Start(2000)
@@ -115,7 +126,7 @@ class TimeSaver(wx.Frame):
     def onTimer(self, event):
         data = self.timecollector.collect()
         if self.IsShown():
-            self.log(data)
+            self.logViewer.log(data)
 
     def onDashboard(self, event):
         webbrowser.open('http://localhost::8080/dashboard/index.html')
