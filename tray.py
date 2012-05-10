@@ -44,11 +44,9 @@ class LogViewer(wx.Panel):
         self.text = wx.TextCtrl(self,
                         style=wx.TE_MULTILINE | wx.TE_RICH2 | wx.HSCROLL)
 
-        box = wx.BoxSizer(wx.HORIZONTAL)
+        box = wx.BoxSizer()
         box.Add(self.text, 1, wx.EXPAND)
-        self.SetAutoLayout(True)
         self.SetSizer(box)
-        self.Layout()
 
     def log(self, string):
         self.text.AppendText(string)
@@ -66,14 +64,22 @@ class TimeSaver(wx.Frame):
                             wx.BITMAP_TYPE_PNG)
         self.SetIcon(self.icon)
 
-        # tabs
-        self.logViewer = LogViewer(self)
+        
 
-        box = wx.BoxSizer(wx.HORIZONTAL)
-        box.Add(self.logViewer, 1, wx.EXPAND)
-        self.SetAutoLayout(True)
+        p = wx.Panel(self)
+        nb = wx.Notebook(p)
+        
+        # tabs
+        self.logViewer = LogViewer(nb)
+        nb.AddPage(self.logViewer, "Logging")
+
+        sizer = wx.BoxSizer()
+        sizer.Add(nb, 1, wx.EXPAND)
+        p.SetSizer(sizer)
+
+        box = wx.BoxSizer()
+        box.Add(p, 1, wx.EXPAND)
         self.SetSizer(box)
-        self.Layout()
 
         # minimize event
         self.Bind(wx.EVT_ICONIZE, self.OnMinimize)
