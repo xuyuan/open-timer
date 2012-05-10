@@ -44,14 +44,14 @@ class LogViewer(wx.Panel):
         self.text = wx.TextCtrl(self,
                         style=wx.TE_MULTILINE | wx.TE_RICH2 | wx.HSCROLL)
 
+        box = wx.BoxSizer(wx.HORIZONTAL)
+        box.Add(self.text, 1, wx.EXPAND)
+        self.SetAutoLayout(True)
+        self.SetSizer(box)
+        self.Layout()
+
     def log(self, string):
         self.text.AppendText(string)
-
-    def OnSize(self, event):
-        size = self.GetClientSize()
-        self.text.SetSize(size)
-        self.SetSize(size)
-        event.Skip()
 
 
 class TimeSaver(wx.Frame):
@@ -69,8 +69,12 @@ class TimeSaver(wx.Frame):
         # tabs
         self.logViewer = LogViewer(self)
 
-        # resize event
-        self.Bind(wx.EVT_SIZE, self.OnSize)
+        box = wx.BoxSizer(wx.HORIZONTAL)
+        box.Add(self.logViewer, 1, wx.EXPAND)
+        self.SetAutoLayout(True)
+        self.SetSizer(box)
+        self.Layout()
+
         # minimize event
         self.Bind(wx.EVT_ICONIZE, self.OnMinimize)
         # close event
@@ -80,7 +84,7 @@ class TimeSaver(wx.Frame):
         #self.tb = self.CreateToolBar()
 
         # status bar
-        self.CreateStatusBar()
+        #self.CreateStatusBar()
 
         # Task Bar Icon
         self.tray = TimeSaverTaskBarIcon(self)
@@ -114,10 +118,6 @@ class TimeSaver(wx.Frame):
 
     def OnMinimize(self, event):
         self.Show(False)
-        event.Skip()
-
-    def OnSize(self, event):
-        self.logViewer.OnSize(event)
         event.Skip()
 
     def start(self):
