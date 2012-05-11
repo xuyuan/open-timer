@@ -6,7 +6,6 @@ will rememinder you when you use a program which is not in the list of task.
 __author__ = 'Xu, Yuan'
 
 import os
-import pickle
 import re
 import json
 import wx
@@ -16,7 +15,8 @@ from dict import appdict
 
 
 class Task(object):
-    def __init__(self, apps, maxDistraction):
+    def __init__(self, name, apps, maxDistraction):
+        self.name = name
         self.setApps(apps)
 
         self.maxDistraction = maxDistraction
@@ -30,8 +30,10 @@ class Task(object):
         for name in self.appNames.split(' '):
             if name in appdict:
                 self.apps.append(re.compile(appdict[name]))
-            else:
-                wx.MessageBox('unknown app: ' + name)
+            elif name:
+                wx.MessageBox('unknown app: ' + name +
+                              ' in task ' + self.name,
+                              'warning')
 
     def start(self):
         print 'start task v2'
@@ -55,15 +57,32 @@ class Task(object):
         if self.maxDistraction > 0 and self.distraction > self.maxDistraction:
             wx.MessageBox('what are u doing?!!', 'You are wasting time!')
 
-    def loads(self, jsonStr):
+    @staticmethod
+    def loads(jsonStr):
         '''load from json'''
-        pass
+        v = json.loads(jsonStr)
+        t = Task(v['name'], '', 0)
+        if 'apps' in v:
+            t.setApps(v['apps'])
+        if 'maxDistraction' in v:
+            t.maxDistraction = v['maxDistraction']
+        return t
 
     def dumps(self):
         '''dumps to json'''
-        print json.dumps({'apps': self.appNames,
+        return json.dumps({'name': self.name,
+                    'apps': self.appNames,
                     'maxDistraction': self.maxDistraction})
-        pass
+
+    @staticmethod
+    def load(f):
+        '''load from a file'''
+        content = '\n'.join(f.readlines())
+        return Task.loads(content)
+
+    def dump(self, f):
+        '''dumps to a file'''
+        f.write(self.dumps())
 
 
 class TaskManager(wx.Panel):
@@ -126,9 +145,10 @@ class TaskManager(wx.Panel):
     def OnSave(self, event):
         if self.taskName.GetValue():
             filePath = os.path.join(self.dataDir, self.taskName.GetValue())
-            t = Task(self.appsInput.GetValue(),
+            t = Task(self.taskName.GetValue(),
+                     self.appsInput.GetValue(),
                      self.maxDistractionInput.GetValue())
-            pickle.dump(t, open(filePath, 'w'))
+            t.dump(open(filePath, 'w'))
             self.refresh(self.taskName.GetValue())
 
     def OnCancel(self, event):
@@ -141,7 +161,9 @@ class TaskManager(wx.Panel):
             self.taskChoser.Append(name)
             if name:
                 filePath = os.path.join(self.dataDir, name)
-                t = pickle.load(open(filePath))
+                t = Task.load(open(filePath))
+                f = open(filePath, 'w')
+                f.write(t.dumps())
                 self.tasks[name] = t
         if selectedTask:
             self.taskChoser.SetStringSelection(selectedTask)
