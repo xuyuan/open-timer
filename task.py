@@ -15,7 +15,7 @@ from dict import appdict
 
 
 class Task(object):
-    def __init__(self, name, apps, maxDistraction):
+    def __init__(self, name, apps='', maxDistraction=0):
         self.name = name
         self.setApps(apps)
 
@@ -23,6 +23,8 @@ class Task(object):
 
         self.distracting = False
         self.distraction = 0
+
+        self.dlg = None
 
     def setApps(self, apps):
         self.appNames = apps
@@ -55,13 +57,17 @@ class Task(object):
             self.distraction = 0
 
         if self.maxDistraction > 0 and self.distraction > self.maxDistraction:
-            wx.MessageBox('what are u doing?!!', 'You are wasting time!')
+            if not self.dlg:
+                self.dlg = wx.Dialog(None, title='what are u doing?!!',
+                        style=wx.DEFAULT_DIALOG_STYLE | wx.STAY_ON_TOP)
+            self.dlg.Show(False)
+            self.dlg.Show(True)
 
     @staticmethod
     def loads(jsonStr):
         '''load from json'''
         v = json.loads(jsonStr)
-        t = Task(v['name'], '', 0)
+        t = Task(v['name'])
         if 'apps' in v:
             t.setApps(v['apps'])
         if 'maxDistraction' in v:
