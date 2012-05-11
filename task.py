@@ -8,6 +8,7 @@ __author__ = 'Xu, Yuan'
 import os
 import pickle
 import re
+import json
 import wx
 from wx.lib.intctrl import IntCtrl
 
@@ -16,6 +17,14 @@ from dict import appdict
 
 class Task(object):
     def __init__(self, apps, maxDistraction):
+        self.setApps(apps)
+
+        self.maxDistraction = maxDistraction
+
+        self.distracting = False
+        self.distraction = 0
+
+    def setApps(self, apps):
         self.appNames = apps
         self.apps = []
         for name in self.appNames.split(' '):
@@ -23,11 +32,6 @@ class Task(object):
                 self.apps.append(re.compile(appdict[name]))
             else:
                 wx.MessageBox('unknown app: ' + name)
-
-        self.maxDistraction = maxDistraction
-
-        self.distracting = False
-        self.distraction = 0
 
     def start(self):
         print 'start task v2'
@@ -51,6 +55,16 @@ class Task(object):
         if self.maxDistraction > 0 and self.distraction > self.maxDistraction:
             wx.MessageBox('what are u doing?!!', 'You are wasting time!')
 
+    def loads(self, jsonStr):
+        '''load from json'''
+        pass
+
+    def dumps(self):
+        '''dumps to json'''
+        print json.dumps({'apps': self.appNames,
+                    'maxDistraction': self.maxDistraction})
+        pass
+
 
 class TaskManager(wx.Panel):
     def __init__(self, parent):
@@ -64,8 +78,6 @@ class TaskManager(wx.Panel):
 
         self.taskChoser = wx.ComboBox(self, style=wx.CB_READONLY)
         self.taskChoser.Bind(wx.EVT_COMBOBOX, self.OnSelect)
-        self.refresh()
-        #self.taskChoser.SetSelection(0)
         box.Add(self.taskChoser)
 
         grid = wx.GridSizer(4, 2)
@@ -74,7 +86,7 @@ class TaskManager(wx.Panel):
         self.taskName = wx.TextCtrl(self)
 
         self.appsInput = wx.TextCtrl(self)
-        
+
         self.maxDistractionInput = IntCtrl(self, value=0, min=0)
 
         deleteButton = wx.Button(self, label='Delete')
@@ -96,8 +108,20 @@ class TaskManager(wx.Panel):
 
                      (deleteButton), (cancelButton), (saveButton)])
 
+        self.refresh()
+
     def OnDelete(self, event):
-        pass
+        if self.taskName.GetValue():
+            dlg = wx.MessageDialog(self,
+                    "Do you really want to delete this task?",
+                    "Delete " + self.taskName.GetValue(),
+                    wx.OK | wx.CANCEL)
+            result = dlg.ShowModal()
+            if result == wx.ID_OK:
+                filePath = os.path.join(self.dataDir, self.taskName.GetValue())
+                os.remove(filePath)
+                del self.tasks[self.taskName.GetValue()]
+                self.refresh()
 
     def OnSave(self, event):
         if self.taskName.GetValue():
@@ -105,6 +129,7 @@ class TaskManager(wx.Panel):
             t = Task(self.appsInput.GetValue(),
                      self.maxDistractionInput.GetValue())
             pickle.dump(t, open(filePath, 'w'))
+            self.refresh(self.taskName.GetValue())
 
     def OnCancel(self, event):
         self.refresh(self.taskChoser.GetValue())
@@ -120,6 +145,8 @@ class TaskManager(wx.Panel):
                 self.tasks[name] = t
         if selectedTask:
             self.taskChoser.SetStringSelection(selectedTask)
+        else:
+            self.taskChoser.SetSelection(0)
         self.OnSelect(None)
 
     def OnSelect(self, event):
@@ -128,5 +155,4 @@ class TaskManager(wx.Panel):
             self.taskName.SetValue(name)
             t = self.tasks[name]
             self.appsInput.SetValue(t.appNames)
-            self.maxDistraction.SetValue(t.maxDistraction)
-        
+            self.maxDistractionInput.SetValue(t.maxDistraction)
