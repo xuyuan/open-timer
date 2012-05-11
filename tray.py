@@ -12,6 +12,7 @@ import sys
 import os
 import wx
 from timecollector import TimeCollector
+from task import TaskManager
 import webbrowser
 
 
@@ -19,20 +20,46 @@ class TimeSaverTaskBarIcon(wx.TaskBarIcon):
     """indicator"""
     def __init__(self, parent):
         wx.TaskBarIcon.__init__(self)
-        self.parentApp = parent
+        self.parent = parent
         self.CreateMenu()
 
     def CreateMenu(self):
         self.Bind(wx.EVT_TASKBAR_RIGHT_UP, self.ShowMenu)
 
+        self.taskmenu = wx.Menu()
+
         self.menu = wx.Menu()
-        self.menu.Append(101, '&Resume')
-        self.menu.Append(102, '&Dashboard')
+        self.menu.AppendMenu(101, '&Task', self.taskmenu)
+        self.menu.Append(102, '&Resume')
+        dashboardButton = self.menu.Append(-1, '&Dashboard')
+        self.Bind(wx.EVT_MENU, self.onDashboard, dashboardButton)
         self.menu.AppendSeparator()
         self.menu.Append(wx.ID_EXIT, '&Close')
 
     def ShowMenu(self, event):
         self.PopupMenu(self.menu)
+
+    def UpdateTasks(self, tasks):
+        id = wx.NewId()
+        menuItem = self.taskmenu.Append(id, 'None', kind=wx.ITEM_RADIO)
+        self.taskmenu.Bind(wx.EVT_MENU, self.CheckOut, menuItem)
+        for t in tasks:
+            id = wx.NewId()
+            menuItem = self.taskmenu.Append(id, t, kind=wx.ITEM_RADIO)
+            self.taskmenu.Bind(wx.EVT_MENU, self.CheckIn, menuItem)
+
+    def CheckOut(self, event):
+        #id = event.GetId()
+        pass
+
+    def CheckIn(self, event):
+        id = event.GetId()
+        item = self.taskmenu.FindItemById(id)
+        self.parent.CheckIn(item.GetLabel())
+
+    def onDashboard(self, event):
+        webbrowser.open('http://localhost::8080/dashboard/index.html')
+        event.Skip()
 
 
 class LogViewer(wx.Panel):
@@ -55,8 +82,9 @@ class LogViewer(wx.Panel):
 class TimeSaver(wx.Frame):
     """main frame"""
     def __init__(self):
-        title = 'TimeSaver'
+        title = 'Save My Time'
         size = (500, 500)
+        self.step = 2000
         wx.Frame.__init__(self, parent=None, title=title, size=size)
 
         self.icon = wx.Icon(os.path.join(os.path.dirname(__file__),
@@ -64,46 +92,40 @@ class TimeSaver(wx.Frame):
                             wx.BITMAP_TYPE_PNG)
         self.SetIcon(self.icon)
 
-        
-
         p = wx.Panel(self)
         nb = wx.Notebook(p)
-        
+
         # tabs
+        self.currentTask = None
+        self.task = TaskManager(nb)
+        nb.AddPage(self.task, "Task")
+
         self.logViewer = LogViewer(nb)
         nb.AddPage(self.logViewer, "Logging")
 
-        sizer = wx.BoxSizer()
-        sizer.Add(nb, 1, wx.EXPAND)
-        p.SetSizer(sizer)
-
         box = wx.BoxSizer()
-        box.Add(p, 1, wx.EXPAND)
-        self.SetSizer(box)
+        box.Add(nb, 1, wx.EXPAND)
+        p.SetSizer(box)
 
         # minimize event
         self.Bind(wx.EVT_ICONIZE, self.OnMinimize)
         # close event
         self.Bind(wx.EVT_CLOSE, self.OnClose)
 
-        # toolbar
-        #self.tb = self.CreateToolBar()
-
-        # status bar
-        #self.CreateStatusBar()
-
         # Task Bar Icon
         self.tray = TimeSaverTaskBarIcon(self)
         self.tray.Bind(wx.EVT_MENU, self.OnMenuClose, id=wx.ID_EXIT)
-        self.tray.Bind(wx.EVT_MENU, self.OnResume, id=101)
-        self.tray.Bind(wx.EVT_MENU, self.onDashboard, id=102)
+        self.tray.Bind(wx.EVT_MENU, self.OnResume, id=102)
         self.tray.Bind(wx.EVT_TASKBAR_LEFT_DCLICK, self.OnResume)
         self.tray.SetIcon(self.icon)
+        self.tray.UpdateTasks(self.task.tasks.keys())
 
         #####
         self.timecollector = TimeCollector()
         self.timer = wx.Timer(self)
         wx.EVT_TIMER(self, self.timer.GetId(), self.onTimer)
+
+        self.Centre()
 
     def OnResume(self, event):
             self.Show(not self.IsShown())
@@ -127,17 +149,26 @@ class TimeSaver(wx.Frame):
         event.Skip()
 
     def start(self):
-            self.timer.Start(2000)
+            self.timer.Start(self.step)
 
     def onTimer(self, event):
         data = self.timecollector.collect()
         if self.IsShown():
             self.logViewer.log(data)
+        if self.currentTask:
+            self.currentTask.update(data, self.step)
 
-    def onDashboard(self, event):
-        webbrowser.open('http://localhost::8080/dashboard/index.html')
-        event.Skip()
+    def CheckOut(self):
+        if self.currentTask:
+            self.currentTask.stop()
+            self.currentTask = None
 
+    def CheckIn(self, task):
+        newTask = self.task.tasks[task]
+        if self.currentTask != newTask:
+            self.CheckOut()
+            self.currentTask = newTask
+            self.currentTask.start()
 
 def main():
     app = wx.App(False)
