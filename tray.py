@@ -49,8 +49,7 @@ class TimeSaverTaskBarIcon(wx.TaskBarIcon):
             self.taskmenu.Bind(wx.EVT_MENU, self.CheckIn, menuItem)
 
     def CheckOut(self, event):
-        #id = event.GetId()
-        pass
+        self.parent.CheckOut()
 
     def CheckIn(self, event):
         id = event.GetId()

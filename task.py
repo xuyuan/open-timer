@@ -9,12 +9,13 @@ import os
 import pickle
 import re
 import wx
+from wx.lib.intctrl import IntCtrl
 
 from dict import appdict
 
 
 class Task(object):
-    def __init__(self, apps):
+    def __init__(self, apps, maxDistraction):
         self.appNames = apps
         self.apps = []
         for name in self.appNames.split(' '):
@@ -23,14 +24,17 @@ class Task(object):
             else:
                 wx.MessageBox('unknown app: ' + name)
 
+        self.maxDistraction = maxDistraction
+
         self.distracting = False
         self.distraction = 0
 
     def start(self):
-        print 'start task'
+        print 'start task v2'
 
     def stop(self):
-        pass
+        self.distracting = False
+        self.distraction = 0
 
     def update(self, data, step):
         if data:
@@ -44,8 +48,8 @@ class Task(object):
         else:
             self.distraction = 0
 
-        if self.distraction > 10000:
-            wx.MessageBox('what are u doing?!!')
+        if self.maxDistraction > 0 and self.distraction > self.maxDistraction:
+            wx.MessageBox('what are u doing?!!', 'You are wasting time!')
 
 
 class TaskManager(wx.Panel):
@@ -70,6 +74,8 @@ class TaskManager(wx.Panel):
         self.taskName = wx.TextCtrl(self)
 
         self.appsInput = wx.TextCtrl(self)
+        
+        self.maxDistractionInput = IntCtrl(self, value=0, min=0)
 
         deleteButton = wx.Button(self, label='Delete')
         deleteButton.Bind(wx.EVT_BUTTON, self.OnDelete)
@@ -78,11 +84,15 @@ class TaskManager(wx.Panel):
         saveButton = wx.Button(self, label='Save')
         saveButton.Bind(wx.EVT_BUTTON, self.OnSave)
 
-        grid.AddMany([(wx.StaticText(self, label='Name:'), 0, wx.EXPAND),
-                     (self.taskName, 0, wx.EXPAND),
+        grid.AddMany([
+            (wx.StaticText(self, label='Name:'), 0, wx.EXPAND),
+            (self.taskName, 0, wx.EXPAND),
 
-                     (wx.StaticText(self, label='Apps:'), 0, wx.EXPAND),
-                     (self.appsInput, 0, wx.EXPAND),
+            (wx.StaticText(self, label='Apps:'), 0, wx.EXPAND),
+            (self.appsInput, 0, wx.EXPAND),
+
+            (wx.StaticText(self, label='Max. Distraction:'), 0, wx.EXPAND),
+            (self.maxDistractionInput, 0, wx.EXPAND),
 
                      (deleteButton), (cancelButton), (saveButton)])
 
@@ -92,7 +102,8 @@ class TaskManager(wx.Panel):
     def OnSave(self, event):
         if self.taskName.GetValue():
             filePath = os.path.join(self.dataDir, self.taskName.GetValue())
-            t = Task(self.appsInput.GetValue())
+            t = Task(self.appsInput.GetValue(),
+                     self.maxDistractionInput.GetValue())
             pickle.dump(t, open(filePath, 'w'))
 
     def OnCancel(self, event):
@@ -117,4 +128,5 @@ class TaskManager(wx.Panel):
             self.taskName.SetValue(name)
             t = self.tasks[name]
             self.appsInput.SetValue(t.appNames)
+            self.maxDistraction.SetValue(t.maxDistraction)
         
