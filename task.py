@@ -56,7 +56,8 @@ class Task(object):
         else:
             self.distraction = 0
 
-        if self.maxDistraction > 0 and self.distraction > self.maxDistraction:
+        if (self.maxDistraction > 0 and
+            self.distraction > self.maxDistraction * 1000):
             if not self.dlg:
                 self.dlg = wx.Dialog(None, title='what are u doing?!!',
                         style=wx.DEFAULT_DIALOG_STYLE | wx.STAY_ON_TOP)
@@ -155,6 +156,7 @@ class TaskManager(wx.Panel):
                      self.appsInput.GetValue(),
                      self.maxDistractionInput.GetValue())
             t.dump(open(filePath, 'w'))
+            self.tasks[self.taskName.GetValue()] = t
             self.refresh(self.taskName.GetValue())
 
     def OnCancel(self, event):
