@@ -13,9 +13,11 @@ from week import Week
 from month import Month
 from year import Year
 from chart import Pie, Bar
+import webbrowser
 
 theData = None
 dirname = path.dirname(__file__)
+
 
 class PytimerHandler(BaseHTTPRequestHandler):
 
@@ -69,7 +71,11 @@ class PytimerHandler(BaseHTTPRequestHandler):
         self.send_header('Content-type', 'text/html')
         self.end_headers()
         cmd = self.path[1:]
-        print cmd
+
+        if cmd == 'favicon.ico':
+            # ignore
+            return
+
         if cmd.find('=') == -1:
             s = eval(cmd)
             self.wfile.write(s)
@@ -106,8 +112,9 @@ class PytimerHandler(BaseHTTPRequestHandler):
 
 def main():
     try:
-        server = HTTPServer(('', 8080), PytimerHandler)
+        server = HTTPServer(('', 9090), PytimerHandler)
         print 'started httpserver...'
+        webbrowser.open("http://localhost:9090/dashboard/index.html")
         server.serve_forever()
     except KeyboardInterrupt:
         print '^C received, shutting down server'
