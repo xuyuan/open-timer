@@ -11,7 +11,7 @@ from daemon import Daemon
 import tray
 
 
-class PyTimerDaemon(Daemon):
+class TimerDaemon(Daemon):
     def run(self):
         tray.main()
 
@@ -20,9 +20,9 @@ def usage():
     print "usage: %s start|stop|restart|status" % ""  # sys.argv[0]
 
 if __name__ == "__main__":
-    daemon = PyTimerDaemon('/tmp/pytimer-daemon.pid',
-                            stderr='/tmp/pytimer-stderr.log',
-                            stdout='/tmp/pytimer-stdout.log')
+    daemon = TimerDaemon('/tmp/open-timer-daemon.pid',
+                            stderr='/tmp/open-pytimer-stderr.log',
+                            stdout='/tmp/open-pytimer-stdout.log')
     if len(sys.argv) == 1:
         daemon.start()
     elif len(sys.argv) == 2:
