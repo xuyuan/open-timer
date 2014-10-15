@@ -2,6 +2,7 @@ import os
 from threading import Thread
 import time
 import atexit
+import webbrowser
 try:
     from gi.repository import AppIndicator3 as AppIndicator
 except:
@@ -9,6 +10,7 @@ except:
 
 from gi.repository import Gtk
 from timecollector import TimeCollector
+
 
 class LogViewer(Gtk.Label):
     """widget displays logs"""
@@ -88,13 +90,18 @@ class TimerSaverAppIndicator(object):
         menu_items.show()
 
         # create one item
+        menu_items = Gtk.MenuItem("Dashboard")
+        menu.append(menu_items)
+        menu_items.connect("activate", lambda _: webbrowser.open('http://localhost:9090/dashboard/index.html'))
+        menu_items.show()
+
+        # create one item
         menu_items = Gtk.MenuItem("Quit")
         menu.append(menu_items)
         menu_items.connect("activate", Gtk.main_quit)
         menu_items.show()
 
         self.ind.set_menu(menu)
-
 
 if __name__ == '__main__':
     ind = TimerSaverAppIndicator()
