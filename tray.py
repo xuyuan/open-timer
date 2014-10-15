@@ -173,6 +173,7 @@ def main():
     app = wx.App(False)
     frame = TimeSaver()
     frame.start()
+    frame.Show(True)
     app.MainLoop()
 
 if __name__ == '__main__':
