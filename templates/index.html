@@ -2,30 +2,30 @@
 <html lang="en">
 <head>
 	<title>PyTimer - Dashboard</title>
-	<link type="text/css" href="themes/base/ui.all.css" rel="stylesheet" />
-	<script type="text/javascript" src="js/swfobject.js"></script>
-	<script type="text/javascript" src="js/jquery-1.3.2.js"></script>
-	<script type="text/javascript" src="js/jquery.menu.min.js"></script>
-	<script type="text/javascript" src="js/ui/ui.core.js"></script>
-	<script type="text/javascript" src="js/ui/ui.datepicker.js"></script>
-	<script type="text/javascript" src="js/ui/ui.selectable.js"></script>
-	<script type="text/javascript" src="js/ui/ui.sortable.js"></script>
-	<script type="text/javascript" src="js/ui/ui.resizable.js"></script>
-	<link type="text/css" href="demos.css" rel="stylesheet" />
+	<link type="text/css" href="static/themes/base/ui.all.css" rel="stylesheet" />
+	<script type="text/javascript" src="static/js/swfobject.js"></script>
+	<script type="text/javascript" src="static/js/jquery-1.3.2.js"></script>
+	<script type="text/javascript" src="static/js/jquery.menu.min.js"></script>
+	<script type="text/javascript" src="static/js/ui/ui.core.js"></script>
+	<script type="text/javascript" src="static/js/ui/ui.datepicker.js"></script>
+	<script type="text/javascript" src="static/js/ui/ui.selectable.js"></script>
+	<script type="text/javascript" src="static/js/ui/ui.sortable.js"></script>
+	<script type="text/javascript" src="static/js/ui/ui.resizable.js"></script>
+	<link type="text/css" href="static/demos.css" rel="stylesheet" />
 	<script type="text/javascript">
 
-		var CategoryTimeSetting = "Pie";
-		var ApplicationTimeSetting = "Bar";
+		var CategoryTimeSetting = "pie";
+		var ApplicationTimeSetting = "bar";
 		function reloadCategoryTime()
 		{
 			tmp = findSWF("Category Time Chart");
-			x = tmp.reload("/"+CategoryTimeSetting+"(self.getData().categoryList).json()");
+			x = tmp.reload("/category_list/"+CategoryTimeSetting);
 		}
 
 		function reloadApplicationTime()
 		{
 			tmp = findSWF("Application Time Chart");
-			x = tmp.reload("/"+ApplicationTimeSetting+"(self.getData().applicationList).json()");
+			x = tmp.reload("/application_list/"+ApplicationTimeSetting);
 		}
 
 		function reload()
@@ -45,22 +45,24 @@
 		var periodIndex = 0;
 		function selectPeriod() {
 			var d = $("#datepicker").datepicker( 'getDate' );
-			var ds = d.getFullYear()+','+(d.getMonth()+1)+','+d.getDate();
+			var ds = '&yy='+d.getFullYear()+'&mm='+(d.getMonth()+1)+'&dd='+d.getDate();
 			var path;
+			var period;
 			switch(periodIndex){
 				case 0:
-					path = '/self.setDay('+ds+')';
+					period = 'Day';
 				break;
 				case 1:
-					path = '/self.setWeek('+ds+')';
+					period = 'Week'
 				break;
 				case 2:
-					path = '/self.setMonth('+ds+')';
+					period = 'Month'
 				break;
 				case 3:
-					path = '/self.setYear('+ds+')';
+					period = 'Year'
 				break;
 			};
+			path = '/set_time?period=' + period + ds
 			$.get(path, function(data) {
 				$("#commandResult").empty().append(data);
 				});
@@ -106,15 +108,15 @@
 
 	<script type="text/javascript">
 		swfobject.embedSWF(
-  		"open-flash-chart.swf", "Category Time Chart", "100%", "100%",
+  		"static/open-flash-chart.swf", "Category Time Chart", "100%", "100%",
   		"9.0.0", "expressInstall.swf",
-  		{"data-file":"/"+CategoryTimeSetting+"(self.getData().categoryList).json()"}
+  		{"data-file":"/category_list/"+CategoryTimeSetting}
   		);
 
 		swfobject.embedSWF(
-  		"open-flash-chart.swf", "Application Time Chart", "100%", "100%",
+  		"static/open-flash-chart.swf", "Application Time Chart", "100%", "100%",
   		"9.0.0", "expressInstall.swf",
-  		{"data-file":"/"+ApplicationTimeSetting+"(self.getData().applicationList).json()"}
+  		{"data-file":"/application_list/"+ApplicationTimeSetting}
   		);
 	</script>
 
@@ -150,8 +152,8 @@
 			</div>
 			<div id="CategoryTimeSetting">Setting
 				<ul>
-					<li>Pie</li>
-					<li>Bar</li>
+					<li>pie</li>
+					<li>bar</li>
 				</ul>
 			</div>
 		</li>
@@ -162,8 +164,8 @@
 			</div>
 			<div id="ApplicationTimeSetting">Setting
 				<ul>
-					<li>Pie</li>
-					<li>Bar</li>
+					<li>pie</li>
+					<li>bar</li>
 				</ul>
 			</div>
 		</li>
