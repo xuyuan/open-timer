@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 import os
 from threading import Thread
 import time
@@ -71,11 +73,9 @@ class TimerSaverAppIndicator(object):
 
     def __init__(self):
         self.ind = AppIndicator.Indicator.new("Open Timer",
-                                              self.icon,
-                                              AppIndicator.IndicatorCategory.APPLICATION_STATUS)
-
+                                              "distributor-logo",
+                                              AppIndicator.IndicatorCategory.OTHER)
         self.ind.set_status(AppIndicator.IndicatorStatus.ACTIVE)
-        self.ind.set_attention_icon(self.icon)
 
         self.win = MainWindow()
         self.win.connect("delete-event", lambda _, __: self.win.hide())
@@ -103,6 +103,10 @@ class TimerSaverAppIndicator(object):
 
         self.ind.set_menu(menu)
 
-if __name__ == '__main__':
+
+def main():
     ind = TimerSaverAppIndicator()
     Gtk.main()
+
+if __name__ == '__main__':
+    main()
