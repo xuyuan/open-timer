@@ -63,7 +63,10 @@ def application_list(chart):
     return create_chart(get_data().applicationList, chart)
 
 
-if __name__ == '__main__':
-    import webbrowser
-    webbrowser.open('http://localhost:5050')
+def main():
     app.run(port=5050, debug=True)
+
+if __name__ == '__main__':
+    #import webbrowser
+    #webbrowser.open('http://localhost:5050')
+    main()

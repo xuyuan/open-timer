@@ -8,12 +8,16 @@ __author__ = 'Xu, Yuan'
 
 import sys
 from daemon import Daemon
-import tray
+
+import webapp
+from timecollector import TimeCollector
 
 
 class TimerDaemon(Daemon):
     def run(self):
-        tray.main()
+        timecollector = TimeCollector()
+        timecollector.start()
+        webapp.main()
 
 
 def usage():
@@ -21,8 +25,8 @@ def usage():
 
 if __name__ == "__main__":
     daemon = TimerDaemon('/tmp/open-timer-daemon.pid',
-                            stderr='/tmp/open-pytimer-stderr.log',
-                            stdout='/tmp/open-pytimer-stdout.log')
+                         stderr='/tmp/open-pytimer-stderr.log',
+                         stdout='/tmp/open-pytimer-stdout.log')
     if len(sys.argv) == 1:
         daemon.start()
     elif len(sys.argv) == 2:
